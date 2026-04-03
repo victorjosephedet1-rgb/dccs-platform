@@ -1,0 +1,19 @@
+/* TEAM */
+Founder & CEO: Victor Joseph Edet
+Company: Victor360 Brand Limited
+Business: Victor360 Brand Limited
+Contact: info@dccsverify.com
+Location: Global
+
+/* SITE */
+Platform: DCCS Platform (dccsverify.com)
+Launch Date: 2025-11-05
+Technology: React, TypeScript, Supabase, Ethereum, AI
+Standards: HTML5, CSS3, ECMAScript 2023
+Components: Vite, Tailwind CSS, Lucide Icons
+Languages: 25+ languages supported
+
+/* THANKS */
+Built with passion for artists worldwide
+Powered by blockchain technology
+Designed for instant global payments

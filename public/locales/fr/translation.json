@@ -1,0 +1,301 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "email": "Email",
+    "password": "Mot de passe",
+    "name": "Nom",
+    "price": "Prix",
+    "duration": "Durée",
+    "genre": "Genre",
+    "artist": "Artiste",
+    "title": "Titre",
+    "actions": "Actions",
+    "status": "Statut"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "sectors": "Secteurs",
+    "marketplace": "Marché",
+    "dashboard": "Tableau de bord",
+    "upload": "Télécharger",
+    "getDCCS": "Obtenir DCCS",
+    "aiTracking": "Suivi IA",
+    "myContent": "Mon Contenu",
+    "liveDemo": "Démo en Direct",
+    "safety": "Sécurité",
+    "guidelines": "Directives",
+    "sellMusic": "Vendre Ma Musique",
+    "adminPortal": "Portail Admin",
+    "signIn": "Se Connecter",
+    "signOut": "Se Déconnecter",
+    "logout": "Déconnexion",
+    "signUp": "S'inscrire",
+    "getStarted": "Commencer",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "browse": "Parcourir",
+    "assets": "actifs",
+    "browseMarketplace": "Explorer le Marché",
+    "browsePacks": "Explorer les Packs Audio",
+    "startSelling": "Commencer à Vendre"
+  },
+  "sectors": {
+    "music": "Musique",
+    "video": "Vidéo",
+    "podcast": "Podcast",
+    "booking": "Réservation"
+  },
+  "header": {
+    "brandName": "DCCS",
+    "tagline": "Solution de Redevances en Temps Réel Alimentée par l'IA"
+  },
+  "landing": {
+    "hero": {
+      "title": "Arrêtez de Supprimer des Vidéos. Utilisez de l'Audio Légal.",
+      "subtitle": "Le premier marché d'utilitaires audio par pack au monde pour les créateurs. Accroches virales, réactions mèmes et kits de marque — tous droits sécurisés.",
+      "getLaunchBundle": "Obtenir le Pack de Lancement 29$",
+      "browseAudioPacks": "Explorer les Packs Audio"
+    },
+    "artists": {
+      "title": "Conçu pour les Créateurs. Monétisé pour les Artistes.",
+      "subtitle": "Fondé par Victor Joseph Edet, PDG de Victor360 Brand Limited. La seule plateforme qui emballe de l'audio performant pour TikTok, Reels, Publicités et UGC.",
+      "artist1": {
+        "name": "DJ SynthWave",
+        "tracks": "3 pistes disponibles",
+        "genre": "Électronique",
+        "quote": "DCCS m'a donné un accès direct aux créateurs de contenu du monde entier. Mes pistes synthwave alimentent maintenant des vidéos YouTube, podcasts et contenu streaming."
+      },
+      "artist2": {
+        "name": "BeatsMaster",
+        "tracks": "2 pistes disponibles",
+        "genre": "Hip Hop",
+        "quote": "Des rythmes urbains qui frappent fort. Je télécharge mes pistes, fixe mon prix et les créateurs les licencient instantanément. Enfin, une rémunération équitable."
+      },
+      "artist3": {
+        "name": "LoFi Producer",
+        "tracks": "3 pistes disponibles",
+        "genre": "Lo-Fi",
+        "quote": "Mes rythmes lo-fi détendus aident les étudiants à se concentrer. Licences simples, paiements instantanés, sans tracas."
+      }
+    },
+    "forCreators": {
+      "title": "Pour les Créateurs de Contenu",
+      "subtitle": "Audio sécurisé pour TikTok, Reels, YouTube Shorts et projets commerciaux",
+      "pack1": "Kit de Démarrage Accroches Virales: 8 éléments, 9$ (prix de lancement)",
+      "pack2": "Arsenal de Réactions: 10 éléments, 12$ (prix de lancement)",
+      "pack3": "Kit de Marque 60 Secondes: 6 éléments, 15$ (prix de lancement)",
+      "bundle": "Pack de Lancement: Les 3 packs pour 29$ (économisez 7$)",
+      "browseMarketplace": "Explorer le Marché"
+    },
+    "forArtists": {
+      "title": "Pour les Créateurs Audio",
+      "subtitle": "Emballez vos sons en utilitaires prêts à devenir viraux. Soyez payé instantanément.",
+      "benefit1": "Créez des packs de 6-10 éléments (accroches, réactions, transitions)",
+      "benefit2": "Fixez le prix de 9$ à 25$ — vous gardez 80% de chaque vente",
+      "benefit3": "Paiements instantanés via Stripe Connect (pas de retenue de 30 jours)",
+      "benefit4": "Registre blockchain — transparence totale, zéro litige",
+      "startSelling": "Commencer à Vendre"
+    },
+    "samples": {
+      "title": "Audio en Action",
+      "subtitle": "Packs réels disponibles maintenant",
+      "tracksAvailable": "pistes disponibles",
+      "perTrack": "par piste",
+      "noSamples": "Chargement des pistes d'exemple..."
+    },
+    "howItWorks": {
+      "title": "Comment Fonctionne DCCS",
+      "subtitle": "Du téléversement au paiement — 100% transparent",
+      "step1": {
+        "title": "Téléversez Vos Éléments",
+        "description": "Glissez-déposez des fichiers audio. Créez des packs de 6-10 utilitaires."
+      },
+      "step2": {
+        "title": "Fixez Votre Prix",
+        "description": "Choisissez de 9$ à 25$ par pack. Vous gardez 80% de chaque vente."
+      },
+      "step3": {
+        "title": "Recevez des Paiements Instantanés",
+        "description": "Paiements vérifiés par blockchain. Pas d'attente. Pas de litiges."
+      }
+    },
+    "cta": {
+      "title": "Rejoignez la Révolution des Licences",
+      "subtitle": "Fondé par Victor Joseph Edet. Conçu pour la prochaine génération de créateurs.",
+      "offerTitle": "Offre de Lancement",
+      "offerDescription": "Les 10 000 premiers artistes obtiennent des fonctionnalités professionnelles à vie. Pas de frais d'installation.",
+      "startJourney": "Commencez Votre Parcours"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bon Retour",
+      "subtitle": "Accédez à votre compte DCCS",
+      "securityNotice": "Votre compte vous connecte à une technologie révolutionnaire de suivi des redevances",
+      "roleSelection": "Je suis un:",
+      "contentCreator": "Créateur de Contenu",
+      "musicArtist": "Artiste Musical",
+      "emailAddress": "Adresse email",
+      "enterEmail": "Entrez votre email",
+      "enterPassword": "Entrez votre mot de passe",
+      "signingIn": "Connexion en cours...",
+      "signIn": "Se Connecter",
+      "noAccount": "Pas de compte?",
+      "signUpHere": "Inscrivez-vous ici"
+    },
+    "register": {
+      "title": "Commencez avec DCCS",
+      "subtitle": "Rejoignez l'avenir des licences musicales",
+      "revolutionaryTitle": "Fonctionnalités Révolutionnaires:",
+      "feature1": "Technologie avancée de suivi des redevances de Victor360 Brand",
+      "feature2": "Système de licences par pack unique en son genre",
+      "feature3": "Méthodologie en instance de brevet pour résolution instantanée",
+      "feature4": "Transparence totale et portée mondiale",
+      "wantTo": "Je veux:",
+      "licenseMusic": "Licencier de la Musique",
+      "forCreators": "Pour créateurs",
+      "sellMusic": "Vendre Ma Musique",
+      "forArtists": "Pour artistes",
+      "artistName": "Nom d'Artiste",
+      "fullName": "Nom Complet",
+      "enterArtistName": "Entrez votre nom d'artiste",
+      "enterFullName": "Entrez votre nom complet",
+      "createPassword": "Créez un mot de passe",
+      "passwordSecurity": "Votre mot de passe sécurise votre identité numérique unique",
+      "creatingAccount": "Création du compte...",
+      "createAccount": "Créer un Compte",
+      "alreadyHaveAccount": "Déjà un compte?",
+      "signInHere": "Connectez-vous ici"
+    }
+  },
+  "dashboard": {
+    "artist": {
+      "title": "Tableau de Bord Artiste",
+      "welcome": "Bon retour, {{name}}!",
+      "uploadTrack": "Téléverser Nouvelle Piste",
+      "tabs": {
+        "overview": "Vue d'ensemble",
+        "snippets": "Mes Extraits",
+        "aiInsights": "Analyses IA",
+        "globalRoyalties": "Redevances Mondiales",
+        "instantPayouts": "Paiements Instantanés",
+        "protection": "Protection des Droits",
+        "blockchain": "Registre Blockchain",
+        "payouts": "Paiements"
+      },
+      "stats": {
+        "totalEarnings": "Gains Totaux",
+        "totalLicenses": "Licences Totales",
+        "activeSnippets": "Extraits Actifs",
+        "topPerformer": "Meilleure Performance",
+        "thisMonth": "ce mois-ci",
+        "readyForLicensing": "Prêt pour licence",
+        "mostLicensed": "Piste la plus licenciée"
+      },
+      "snippets": {
+        "title": "Vos Extraits",
+        "subtitle": "Gérez vos pistes et extraits téléversés",
+        "tableHeaders": {
+          "title": "Titre",
+          "duration": "Durée",
+          "price": "Prix",
+          "licenses": "Licences",
+          "earnings": "Gains",
+          "status": "Statut",
+          "actions": "Actions"
+        },
+        "noSnippets": {
+          "title": "Pas encore d'extraits",
+          "description": "Téléversez votre première piste pour commencer à gagner",
+          "uploadFirst": "Téléversez Votre Première Piste"
+        }
+      }
+    }
+  },
+  "marketplace": {
+    "title": "Marché des Créateurs",
+    "subtitle": "Découvrez et licenciez des extraits musicaux premium",
+    "searchPlaceholder": "Rechercher par chanson, artiste, ambiance ou genre...",
+    "filters": {
+      "allGenres": "Tous les Genres",
+      "allMoods": "Toutes les Ambiances",
+      "minPrice": "Prix Minimum",
+      "maxPrice": "Prix Maximum",
+      "anyLength": "Toute Durée"
+    },
+    "loading": {
+      "title": "Chargement des extraits...",
+      "subtitle": "Trouver les sons parfaits pour vous"
+    },
+    "noResults": "Aucun extrait trouvé.",
+    "license": "Licencier",
+    "addedToFavorites": "Ajouté aux Favoris",
+    "removedFromFavorites": "Retiré des Favoris",
+    "snippetAdded": "Extrait ajouté aux favoris",
+    "snippetRemoved": "Extrait retiré des favoris"
+  },
+  "notifications": {
+    "uploadReady": "Téléversement Prêt",
+    "uploadModalReady": "Le modal de téléversement est prêt",
+    "fileSelected": "Fichier Sélectionné",
+    "fileReady": "est prêt pour téléversement",
+    "invalidFileType": "Type de Fichier Invalide",
+    "selectValidAudio": "Veuillez sélectionner un fichier audio valide (MP3, WAV, FLAC, M4A)",
+    "uploadModalOpening": "Ouverture du Modal",
+    "preparingUpload": "Préparation de l'interface...",
+    "uploadError": "Erreur de Téléversement",
+    "uploadModalFailed": "Impossible d'ouvrir le modal. Réessayez.",
+    "audioLoaded": "Audio Chargé",
+    "trackLoaded": "Piste chargée avec succès ({{duration}}s)",
+    "audioLoadError": "Erreur de Chargement Audio",
+    "audioLoadFailed": "Impossible de charger le fichier. Essayez un autre.",
+    "snippetRangeAdded": "Plage Ajoutée",
+    "snippetCreated": "Extrait de {{duration}}s créé",
+    "snippetTooShort": "Extrait Trop Court",
+    "minimumDuration": "Les extraits doivent durer au moins 5 secondes",
+    "snippetRemoved": "Extrait Supprimé",
+    "snippetRangeRemoved": "Plage supprimée",
+    "snippetUploaded": "Extrait Téléversé",
+    "uploadSuccessful": "téléversé avec succès et disponible pour licence",
+    "uploadFailed": "Téléversement Échoué",
+    "creatingSnippets": "Création d'Extraits",
+    "processingSnippets": "Traitement de {{count}} extrait(s)...",
+    "uploadSuccessMultiple": "{{count}} extrait(s) prêt(s) pour licence"
+  },
+  "footer": {
+    "description": "Solution de redevances en temps réel alimentée par l'IA de Victor360 Brand. Résolution des litiges de l'industrie musicale avec automatisation intelligente.",
+    "copyright": "© {{year}} Victor360 Brand. Tous droits réservés. Brevet en instance.",
+    "platform": "Plateforme",
+    "musicMarketplace": "Marché Musical",
+    "artistDashboard": "Tableau de Bord Artiste",
+    "usageGuidelines": "Directives d'Utilisation",
+    "company": "Entreprise",
+    "aiPoweredSolutions": "Solutions IA",
+    "globalInfrastructure": "Infrastructure Mondiale",
+    "builtBy": "Conçu par Victor360 Brand • Brevet en Instance • Tous Droits Réservés"
+  },
+  "language": {
+    "selectLanguage": "Sélectionner la Langue",
+    "detectedRegion": "Détecté:",
+    "searchLanguages": "Rechercher des langues...",
+    "noLanguagesFound": "Aucune langue trouvée",
+    "languageCount": "{{count}} langues • Détecté depuis votre emplacement"
+  }
+}

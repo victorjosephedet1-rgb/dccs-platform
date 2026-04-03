@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCCS - Digital Creative Copyright System | Victor360 Brand Limited</title>
+    <meta name="description" content="DCCS: Revolutionary digital ownership verification platform. Instant proof of creation for audio, video, images, and creative projects. Founded by Victor Joseph Edet.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        h2 {
+            color: #3b82f6;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card h3 {
+            color: #06b6d4;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 20px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            margin: 10px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .cta-button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 60px;
+        }
+
+        .company-info {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 8px 0;
+            color: #cbd5e1;
+        }
+
+        li:before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">DCCS</div>
+            <div class="tagline">Digital Creative Copyright System - Instant Ownership Verification</div>
+            <div class="status-badge">Platform Live & Operational</div>
+        </header>
+
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: #e2e8f0;">
+                DCCS (Digital Creative Copyright System) is a revolutionary platform that provides instant, cryptographic proof of ownership
+                for digital creative works. Using the proprietary Digital Clearance Code System technology, creators receive permanent
+                verification certificates that prove ownership before sharing their work.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Platform Capabilities</h2>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-value">4</span>
+                    <div class="stat-label">Asset Types Supported</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">&lt;30s</span>
+                    <div class="stat-label">Certificate Generation</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">100%</span>
+                    <div class="stat-label">Free in Phase 1</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">Forever</span>
+                    <div class="stat-label">Certificate Validity</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Digital Clearance Code System Technology</h2>
+            <p style="font-size: 1.05rem; line-height: 1.8; color: #e2e8f0; margin-bottom: 20px;">
+                Every file uploaded to DCCS receives a <strong>unique Digital Clearance Code</strong> that creates an unbreakable
+                chain of ownership. This cryptographic fingerprint is permanent, publicly verifiable, and legally binding.
+            </p>
+            <div class="grid">
+                <div class="card">
+                    <h3>Upload & Fingerprint</h3>
+                    <p>When creators upload content, the system generates a unique cryptographic fingerprint using advanced audio/visual analysis. This fingerprint is stored permanently and cannot be altered.</p>
+                </div>
+                <div class="card">
+                    <h3>Instant Certificate</h3>
+                    <p>Within seconds, creators receive a DCCS Certificate with a unique clearance code. This certificate includes timestamp, fingerprint hash, and creator identity verification.</p>
+                </div>
+                <div class="card">
+                    <h3>Public Verification</h3>
+                    <p>Anyone can verify ownership by entering the clearance code on our public portal. The system instantly confirms authenticity, timestamp, and original creator.</p>
+                </div>
+                <div class="card">
+                    <h3>Legal Protection</h3>
+                    <p>DCCS certificates serve as legal proof of creation date and ownership. Courts worldwide recognize cryptographic timestamps as valid evidence.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Technology Stack</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Frontend</h3>
+                    <ul>
+                        <li>React 18 + TypeScript</li>
+                        <li>Vite Build System</li>
+                        <li>Tailwind CSS</li>
+                        <li>Progressive Web App</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Backend</h3>
+                    <ul>
+                        <li>Supabase PostgreSQL</li>
+                        <li>Row Level Security</li>
+                        <li>Edge Functions</li>
+                        <li>Real-time Updates</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Security</h3>
+                    <ul>
+                        <li>SHA-256 Fingerprinting</li>
+                        <li>Cryptographic Timestamps</li>
+                        <li>AES-256 Encryption</li>
+                        <li>Immutable Audit Logs</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Verification</h3>
+                    <ul>
+                        <li>Public Verification Portal</li>
+                        <li>API Access</li>
+                        <li>Blockchain Recording</li>
+                        <li>Global Accessibility</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Business Model</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Phase 1: Free Platform</h3>
+                    <p>Currently 100% free. Focused on building user base and proving technology value.</p>
+                </div>
+                <div class="card">
+                    <h3>Target Market</h3>
+                    <p>Audio producers, video creators, photographers, digital artists, and content creators worldwide.</p>
+                </div>
+                <div class="card">
+                    <h3>Competitive Edge</h3>
+                    <p>Instant verification vs traditional copyright registration (6+ months). Patent-pending technology.</p>
+                </div>
+                <div class="card">
+                    <h3>Scalability</h3>
+                    <p>Fully automated system capable of processing millions of uploads per day with zero human intervention.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Company Information</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Legal Entity</h3>
+                    <p><strong>Victor360 Brand Limited</strong><br>
+                    Registered in Nigeria<br>
+                    RC Number: 7374845</p>
+                </div>
+                <div class="card">
+                    <h3>Leadership</h3>
+                    <p><strong>Victor Joseph Edet</strong><br>
+                    Founder & CEO<br>
+                    Platform Architect & Inventor</p>
+                </div>
+                <div class="card">
+                    <h3>Development Status</h3>
+                    <p><strong>Production Ready</strong><br>
+                    Platform deployed and operational<br>
+                    Active at dccs.platform</p>
+                </div>
+                <div class="card">
+                    <h3>Market Opportunity</h3>
+                    <p><strong>$50B+ TAM</strong><br>
+                    Global copyright market<br>
+                    Growing 12% annually</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2 style="margin-bottom: 20px;">Ready to Explore the Platform?</h2>
+            <a href="/" class="cta-button">Visit Live Platform</a>
+            <a href="/dccs-verification" class="cta-button secondary">Public Verification</a>
+        </div>
+
+        <footer>
+            <div class="company-info">
+                <p><strong>DCCS - Digital Creative Copyright System</strong></p>
+                <p>A Victor360 Brand Limited Product</p>
+                <p>RC: 7374845 | Nigeria</p>
+                <p>© 2026 Victor360 Brand Limited. All rights reserved.</p>
+                <p style="margin-top: 20px; font-size: 0.85rem;">
+                    For investor inquiries, partnership opportunities, or technical documentation,<br>
+                    please contact: <strong>info@victor360brand.com</strong>
+                </p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

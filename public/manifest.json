@@ -1,0 +1,111 @@
+{
+  "name": "DCCS - Digital Copyright Protection",
+  "short_name": "DCCS",
+  "description": "Protect your creative work with instant digital clearance codes. Upload audio, video, images and get permanent proof of ownership. Free copyright registration for creators worldwide.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B0F17",
+  "theme_color": "#FF5A1F",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "dir": "ltr",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities", "photo", "music"],
+  "iarc_rating_id": "",
+  "related_applications": [],
+  "screenshots": [
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "label": "DCCS - Protect Your Creative Work"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Upload & Protect",
+      "short_name": "Upload",
+      "description": "Get instant clearance code",
+      "url": "/upload",
+      "icons": [
+        {
+          "src": "/favicon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "My Files",
+      "short_name": "Files",
+      "description": "View protected files",
+      "url": "/downloads",
+      "icons": [
+        {
+          "src": "/favicon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Verify Code",
+      "short_name": "Verify",
+      "description": "Check clearance code",
+      "url": "/verify",
+      "icons": [
+        {
+          "src": "/favicon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/upload",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "media",
+          "accept": ["audio/*", "video/*", "image/*", "application/pdf"]
+        }
+      ]
+    }
+  }
+}

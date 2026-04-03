@@ -1,0 +1,44 @@
+# robots.txt for DCCS Platform
+# Last Updated: March 20, 2026
+
+User-agent: *
+Allow: /
+
+# Allow public pages
+Allow: /upload
+Allow: /downloads
+Allow: /register
+Allow: /login
+Allow: /demo
+Allow: /story
+Allow: /careers
+Allow: /safety
+
+# Allow DCCS system pages
+Allow: /dccs-system
+Allow: /dccs-registration
+Allow: /dccs-verification
+Allow: /verify
+Allow: /verify-code
+
+# Allow artist profiles
+Allow: /artist/*
+
+# Allow legal pages
+Allow: /legal/*
+
+# Disallow private areas
+Disallow: /my-content
+Disallow: /library
+Disallow: /dccs-admin
+
+# Disallow authentication callbacks and internal routes
+Disallow: /sso/callback
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Sitemap
+Sitemap: https://dccsverify.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

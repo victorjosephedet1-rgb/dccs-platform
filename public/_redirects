@@ -1,0 +1,24 @@
+# DCCS Platform Redirect Rules
+# Last Updated: April 2, 2026
+
+# Redirect legacy domains to primary
+https://v3bmusic.ai/* https://dccsverify.com/:splat 301!
+https://www.v3bmusic.ai/* https://dccsverify.com/:splat 301!
+https://dccs.platform/* https://dccsverify.com/:splat 301!
+https://www.dccs.platform/* https://dccsverify.com/:splat 301!
+
+# Redirect www to non-www for primary domain
+https://www.dccsverify.com/* https://dccsverify.com/:splat 301!
+
+# Redirect old staging/development URLs
+https://staging--v3bmusic.netlify.app/* https://dccsverify.com/:splat 301!
+https://staging--dccs.netlify.app/* https://dccsverify.com/:splat 301!
+
+# Force HTTPS
+http://dccsverify.com/* https://dccsverify.com/:splat 301!
+
+# Redirect old API endpoints if you had any
+# /api/v1/* /api/v2/:splat 301
+
+# SPA fallback for client-side routing (must be last)
+/*    /index.html   200

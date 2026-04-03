@@ -1,0 +1,31 @@
+# CODEOWNERS - Require review for critical files
+# Learn more: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# DEPLOYMENT SYSTEM - CRITICAL (Requires senior engineer review)
+.github/workflows/production-deploy.yml @deployment-team
+.github/workflows/staging-deploy.yml @deployment-team
+netlify.toml @deployment-team
+vite.config.ts @deployment-team
+scripts/pre-deploy-check.sh @deployment-team
+scripts/health-check.sh @deployment-team
+scripts/rollback-deployment.sh @deployment-team
+scripts/validate-deployment.sh @deployment-team
+supabase/functions/notify-deployment-updates/ @deployment-team
+
+# DATABASE MIGRATIONS - CRITICAL (Requires database admin review)
+supabase/migrations/ @database-team
+
+# SECURITY & AUTHENTICATION - CRITICAL (Requires security review)
+src/contexts/AuthContext.tsx @security-team
+src/lib/supabase.ts @security-team
+
+# DOCUMENTATION - Require documentation team review
+docs/ @documentation-team
+README.md @documentation-team
+
+# CONFIGURATION - Require ops team review
+.env.example @ops-team
+.env.production.example @ops-team
+
+# Default owners for everything else
+* @development-team

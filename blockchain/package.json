@@ -1,0 +1,46 @@
+{
+  "name": "@v3bmusic/blockchain",
+  "version": "1.0.0",
+  "description": "V3BMusic.ai Smart Contracts - DCCS Blockchain Infrastructure",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:forge": "forge test -vvv",
+    "test:coverage": "forge coverage --report summary",
+    "test:gas": "forge snapshot",
+    "deploy:local": "hardhat run scripts/deploy/local.ts --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy/testnet.ts --network base-sepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy/mainnet.ts --network base",
+    "verify": "hardhat verify",
+    "node": "hardhat node",
+    "clean": "hardhat clean && forge clean",
+    "lint": "solhint 'contracts/**/*.sol'",
+    "format": "prettier --write 'contracts/**/*.sol' 'test/**/*.sol'",
+    "size": "hardhat size-contracts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-foundry": "^1.1.1",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.0.0",
+    "chai": "^4.3.10",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.9.0",
+    "hardhat": "^2.22.0",
+    "hardhat-contract-sizer": "^2.10.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solhint": "^4.1.1",
+    "solidity-coverage": "^0.8.5",
+    "typechain": "^8.3.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^5.0.0"
+  }
+}

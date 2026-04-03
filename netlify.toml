@@ -1,0 +1,82 @@
+# Digital Creative Copyright System (DCCS)
+# Platform operated by Victor360 Brand Limited
+#
+# DCCS has two meanings:
+# 1. Platform Name: Digital Creative Copyright System - Where creators register digital assets
+# 2. Technology: Digital Clearance Code System - Proprietary ownership verification technology
+#
+# PRIMARY DOMAIN: dccsverify.com
+# LEGACY DOMAIN: v3bmusic.ai (redirects to primary)
+
+# Redirect v3bmusic.ai to dccsverify.com
+[[redirects]]
+from = "https://v3bmusic.ai/*"
+to = "https://dccsverify.com/:splat"
+status = 301
+force = true
+
+[[redirects]]
+from = "https://www.v3bmusic.ai/*"
+to = "https://dccsverify.com/:splat"
+status = 301
+force = true
+
+# Redirect www.dccsverify.com to dccsverify.com
+[[redirects]]
+from = "https://www.dccsverify.com/*"
+to = "https://dccsverify.com/:splat"
+status = 301
+force = true
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+[build]
+command = "npm run build"
+publish = "dist"
+
+[build.environment]
+NODE_VERSION = "20"
+SITE_NAME = "Digital Creative Copyright System (DCCS)"
+SITE_DESCRIPTION = "Prove ownership of digital assets with DCCS - Digital Clearance Code System technology. Upload, fingerprint, and receive permanent ownership certificates for audio, video, images, and creative projects."
+COMPANY_NAME = "Victor360 Brand Limited"
+
+[[headers]]
+for = "/assets/*"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/*.ico"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+Content-Type = "image/x-icon"
+
+[[headers]]
+for = "/*.png"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+Content-Type = "image/png"
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+X-Content-Type-Options = "nosniff"
+X-Frame-Options = "DENY"
+X-XSS-Protection = "1; mode=block"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src https://js.stripe.com; object-src 'none';"
+
+# Site Metadata for Netlify Dashboard
+[context.production]
+environment = { SITE_NAME = "DCCS - Digital Creative Copyright System", COMPANY = "Victor360 Brand Limited", VITE_SUPABASE_URL = "https://aqpvcvflwihrisjxmlfz.supabase.co", VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxcHZjdmZsd2locmlzanhtbGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODk1NTQsImV4cCI6MjA3ODA2NTU1NH0.L_APR_WUkH6i5Rvg6iZsOyVniVO6ZbXrNlva1ybJIzo", VITE_STRIPE_PUBLISHABLE_KEY = "pk_live_51S7exNB87PioOpgwdVfHLxU6FrCnC1EqK6Gzeet1luRCuIGlIgCn1DcKePmOYOLumaU9JHiXD0Zf7MPANFSZvM5G00GpyJnFlf" }
+
+[context.deploy-preview]
+environment = { SITE_NAME = "DCCS Preview", COMPANY = "Victor360 Brand Limited", VITE_SUPABASE_URL = "https://aqpvcvflwihrisjxmlfz.supabase.co", VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxcHZjdmZsd2locmlzanhtbGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODk1NTQsImV4cCI6MjA3ODA2NTU1NH0.L_APR_WUkH6i5Rvg6iZsOyVniVO6ZbXrNlva1ybJIzo", VITE_STRIPE_PUBLISHABLE_KEY = "pk_live_51S7exNB87PioOpgwdVfHLxU6FrCnC1EqK6Gzeet1luRCuIGlIgCn1DcKePmOYOLumaU9JHiXD0Zf7MPANFSZvM5G00GpyJnFlf" }

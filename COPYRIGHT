@@ -1,0 +1,83 @@
+COPYRIGHT NOTICE
+
+DCCS Platform - Digital Creative Copyright System
+==================================================
+
+Copyright (c) 2024-2026 Victor Joseph Edet
+All Rights Reserved
+
+ORIGINAL CREATOR AND INVENTOR: Victor Joseph Edet
+COMPANY: Victor360 Brand Limited
+PROJECT INCEPTION: 2024
+PRIMARY DOMAIN: dccsverify.com
+LEGACY DOMAINS: v3bmusic.ai, dccs.platform
+
+INTELLECTUAL PROPERTY
+---------------------
+This software, including but not limited to:
+- Source code (frontend and backend)
+- Database schemas and migrations
+- Smart contracts and blockchain implementations
+- User interface designs and components
+- Documentation and technical specifications
+- Branding, logos, and visual assets
+- Business logic and algorithms
+- API designs and implementations
+
+...is the exclusive intellectual property of Victor Joseph Edet and Victor360 Brand Limited.
+
+OWNERSHIP DOCUMENTATION
+-----------------------
+Proof of ownership and creation is established through:
+1. Git commit history with timestamped contributions
+2. Domain registration records for dccsverify.com, v3bmusic.ai, and dccs.platform
+3. Deployment and hosting configurations
+4. Copyright registration (if filed)
+5. Business registration documents (if applicable)
+
+PLATFORM COMPONENTS
+-------------------
+Frontend:
+- React/Vite application with TypeScript
+- 26-language translation system
+- Responsive UI/UX design
+- PWA implementation
+
+Backend:
+- Supabase database with 200+ migrations
+- Edge Functions for serverless computing
+- Row Level Security policies
+- Storage management system
+
+Blockchain:
+- DCCS Registry smart contracts
+- Royalty distribution system
+- License NFT implementation
+- Multi-chain support
+
+LICENSING
+---------
+This software is licensed under the MIT License (see LICENSE file).
+You retain all ownership rights while granting usage rights as specified.
+
+CONTACT
+-------
+For ownership verification or licensing inquiries:
+info@victor360brand.com
+https://dccsverify.com
+
+TRADEMARK
+---------
+DCCS™, Digital Creative Copyright System™, and Digital Clearance Code System™
+are trademarks of Victor360 Brand Limited.
+Patent Pending.
+
+DATE OF CREATION
+----------------
+Initial Commit: [Date]
+Last Updated: March 2026
+Version: 1.0.0
+
+---
+This copyright notice should remain intact in all copies and
+derivative works of this software.

@@ -1,0 +1,283 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "search": "Search",
+    "filter": "Filter",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "price": "Price",
+    "duration": "Duration",
+    "genre": "Genre",
+    "artist": "Artist",
+    "title": "Title",
+    "actions": "Actions",
+    "status": "Status"
+  },
+  "navigation": {
+    "marketplace": "Marketplace",
+    "dashboard": "Dashboard",
+    "guidelines": "Guidelines",
+    "sellMusic": "Sell My Music",
+    "adminPortal": "Admin Portal",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "getStarted": "Get Started",
+    "login": "Login",
+    "register": "Register",
+    "browseMarketplace": "Browse Marketplace",
+    "browsePacks": "Browse Audio Packs",
+    "startSelling": "Start Selling Packs"
+  },
+  "header": {
+    "brandName": "DCCS",
+    "tagline": "AI-Powered Real-Time Royalty & Revenue Split Solution"
+  },
+  "landing": {
+    "hero": {
+      "title": "Stop Deleting Videos. Start Using Legal Audio.",
+      "subtitle": "The world's first pack-based audio utility marketplace for short-form creators. Viral hooks, meme reactions, and brand kits — all copyright-safe.",
+      "getLaunchBundle": "Get Launch Bundle $29",
+      "browseAudioPacks": "Browse Audio Packs"
+    },
+    "artists": {
+      "title": "Built for Creators. Monetized for Artists.",
+      "subtitle": "Founded by Victor Joseph Edet, CEO of Victor360 Brand Limited. The only platform packaging performance audio for TikTok, Reels, Ads & UGC.",
+      "artist1": {
+        "name": "DJ SynthWave",
+        "tracks": "3 tracks available",
+        "genre": "Electronic",
+        "quote": "DCCS gave me direct access to content creators worldwide. My neon-soaked synthwave tracks are now powering YouTube videos, podcasts, and streaming content."
+      },
+      "artist2": {
+        "name": "BeatsMaster",
+        "tracks": "2 tracks available",
+        "genre": "Hip Hop",
+        "quote": "Urban beats that hit hard. I upload my tracks, set my price, and creators license them instantly. Finally, fair pay for my craft."
+      },
+      "artist3": {
+        "name": "LoFi Producer",
+        "tracks": "3 tracks available",
+        "genre": "Lo-Fi",
+        "quote": "My chill lo-fi beats help students focus and creators relax their audiences. Simple licensing, instant payouts, no hassle."
+      }
+    },
+    "forCreators": {
+      "title": "For Content Creators",
+      "subtitle": "Copyright-safe audio utilities for TikTok, Reels, YouTube Shorts & commercial projects",
+      "pack1": "Viral Hook Starter Kit: 8 assets, $9 (launch price)",
+      "pack2": "Meme Reaction Arsenal: 10 assets, $12 (launch price)",
+      "pack3": "60-Second Brand Kit: 6 assets, $15 (launch price)",
+      "bundle": "Launch Bundle: All 3 packs for $29 (save $7)",
+      "browseMarketplace": "Browse Marketplace"
+    },
+    "forArtists": {
+      "title": "For Audio Creators",
+      "subtitle": "Package your sounds into viral-ready utility packs. Get paid instantly.",
+      "benefit1": "Create packs of 6-10 assets (hooks, reactions, transitions)",
+      "benefit2": "Set pack pricing $9-$25 — you keep 80% of every sale",
+      "benefit3": "Instant payouts via Stripe Connect (no 30-day holds)",
+      "benefit4": "Blockchain royalty ledger — full transparency, zero disputes",
+      "startSelling": "Start Selling Packs"
+    },
+    "samples": {
+      "title": "Audio Utilities in Action",
+      "subtitle": "Real packs available now",
+      "tracksAvailable": "tracks available",
+      "perTrack": "per track",
+      "noSamples": "Loading sample tracks..."
+    },
+    "howItWorks": {
+      "title": "How DCCS Works",
+      "subtitle": "From upload to payout — 100% transparent",
+      "step1": {
+        "title": "Upload Your Assets",
+        "description": "Drag-and-drop audio files. Create packs of 6-10 utilities."
+      },
+      "step2": {
+        "title": "Set Your Price",
+        "description": "Choose $9-$25 per pack. You keep 80% of every sale."
+      },
+      "step3": {
+        "title": "Get Paid Instantly",
+        "description": "Blockchain-verified payouts. No waiting. No disputes."
+      }
+    },
+    "cta": {
+      "title": "Join the Licensing Revolution",
+      "subtitle": "Founded by Victor Joseph Edet. Built for the next generation of creators.",
+      "offerTitle": "Launch Offer",
+      "offerDescription": "First 10,000 artists get lifetime professional features. No setup fees.",
+      "startJourney": "Start Your Journey"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Access your DCCS account",
+      "securityNotice": "Your account connects you to revolutionary royalty tracking technology",
+      "roleSelection": "I am a:",
+      "contentCreator": "Content Creator",
+      "musicArtist": "Music Artist",
+      "emailAddress": "Email address",
+      "enterEmail": "Enter your email",
+      "enterPassword": "Enter your password",
+      "signingIn": "Signing in...",
+      "signIn": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUpHere": "Sign up here"
+    },
+    "register": {
+      "title": "Get Started with DCCS",
+      "subtitle": "Join the future of music licensing",
+      "revolutionaryTitle": "Revolutionary Platform Features:",
+      "feature1": "Victor360 Brand's advanced royalty tracking technology",
+      "feature2": "First-of-its-kind pack-based licensing system",
+      "feature3": "Patent-pending methodology for instant royalty resolution",
+      "feature4": "Complete transparency and global reach",
+      "wantTo": "I want to:",
+      "licenseMusic": "License Music",
+      "forCreators": "For creators",
+      "sellMusic": "Sell My Music",
+      "forArtists": "For artists",
+      "artistName": "Artist Name",
+      "fullName": "Full Name",
+      "enterArtistName": "Enter your artist name",
+      "enterFullName": "Enter your full name",
+      "createPassword": "Create a password",
+      "passwordSecurity": "Your password secures your unique digital identity and all associated assets",
+      "creatingAccount": "Creating account...",
+      "createAccount": "Create Account",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInHere": "Sign in here"
+    }
+  },
+  "dashboard": {
+    "artist": {
+      "title": "Artist Dashboard",
+      "welcome": "Welcome back, {{name}}!",
+      "uploadTrack": "Upload New Track",
+      "tabs": {
+        "overview": "Overview",
+        "snippets": "My Snippets",
+        "aiInsights": "AI Insights",
+        "globalRoyalties": "Global Royalties",
+        "instantPayouts": "Instant Payouts",
+        "protection": "Copyright Protection",
+        "blockchain": "Blockchain Ledger",
+        "payouts": "Payouts"
+      },
+      "stats": {
+        "totalEarnings": "Total Earnings",
+        "totalLicenses": "Total Licenses",
+        "activeSnippets": "Active Snippets",
+        "topPerformer": "Top Performer",
+        "thisMonth": "this month",
+        "readyForLicensing": "Ready for licensing",
+        "mostLicensed": "Most licensed track"
+      },
+      "snippets": {
+        "title": "Your Snippets",
+        "subtitle": "Manage your uploaded tracks and snippets",
+        "tableHeaders": {
+          "title": "Title",
+          "duration": "Duration",
+          "price": "Price",
+          "licenses": "Licenses",
+          "earnings": "Earnings",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "noSnippets": {
+          "title": "No snippets yet",
+          "description": "Upload your first track to start earning from licensing",
+          "uploadFirst": "Upload Your First Track"
+        }
+      }
+    }
+  },
+  "marketplace": {
+    "title": "Creator Marketplace",
+    "subtitle": "Discover and license premium music snippets for your content",
+    "searchPlaceholder": "Search by song, artist, mood, or genre...",
+    "filters": {
+      "allGenres": "All Genres",
+      "allMoods": "All Moods",
+      "minPrice": "Min Price",
+      "maxPrice": "Max Price",
+      "anyLength": "Any Length"
+    },
+    "loading": {
+      "title": "Loading snippets...",
+      "subtitle": "Finding the perfect sounds for you"
+    },
+    "noResults": "No snippets found matching your criteria.",
+    "license": "License",
+    "addedToFavorites": "Added to Favorites",
+    "removedFromFavorites": "Removed from Favorites",
+    "snippetAdded": "Snippet added to your favorites",
+    "snippetRemoved": "Snippet removed from your favorites"
+  },
+  "notifications": {
+    "uploadReady": "Upload Ready",
+    "uploadModalReady": "Upload modal is ready for your music",
+    "fileSelected": "File Selected",
+    "fileReady": "is ready for upload",
+    "invalidFileType": "Invalid File Type",
+    "selectValidAudio": "Please select a valid audio file (MP3, WAV, FLAC, M4A)",
+    "uploadModalOpening": "Upload Modal Opening",
+    "preparingUpload": "Preparing upload interface...",
+    "uploadError": "Upload Error",
+    "uploadModalFailed": "Failed to open upload modal. Please try again.",
+    "audioLoaded": "Audio Loaded",
+    "trackLoaded": "Track loaded successfully ({{duration}}s)",
+    "audioLoadError": "Audio Load Error",
+    "audioLoadFailed": "Failed to load audio file. Please try a different file.",
+    "snippetRangeAdded": "Snippet Range Added",
+    "snippetCreated": "Created {{duration}}s snippet",
+    "snippetTooShort": "Snippet Too Short",
+    "minimumDuration": "Snippets must be at least 5 seconds long",
+    "snippetRemoved": "Snippet Removed",
+    "snippetRangeRemoved": "Snippet range has been removed",
+    "snippetUploaded": "Snippet Uploaded",
+    "uploadSuccessful": "has been successfully uploaded and is now available for licensing",
+    "uploadFailed": "Upload Failed",
+    "creatingSnippets": "Creating Snippets",
+    "processingSnippets": "Processing {{count}} snippet(s)...",
+    "uploadSuccessMultiple": "{{count}} snippet(s) uploaded and ready for licensing"
+  },
+  "footer": {
+    "description": "AI-powered real-time royalty and revenue split solution by Victor360 Brand. Solving traditional music industry disputes with intelligent automation.",
+    "copyright": "© {{year}} Victor360 Brand. All rights reserved. Patent pending.",
+    "platform": "Platform",
+    "musicMarketplace": "Music Marketplace",
+    "artistDashboard": "Artist Dashboard",
+    "usageGuidelines": "Usage Guidelines",
+    "company": "Company",
+    "aiPoweredSolutions": "AI-Powered Solutions",
+    "globalInfrastructure": "Global Infrastructure",
+    "builtBy": "Built by Victor360 Brand • Patent Pending • All Rights Reserved"
+  },
+  "language": {
+    "selectLanguage": "Select Language",
+    "detectedRegion": "Detected:",
+    "searchLanguages": "Search languages...",
+    "noLanguagesFound": "No languages found",
+    "languageCount": "{{count}} languages • Auto-detected from your location"
+  }
+}
