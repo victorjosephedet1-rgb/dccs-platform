@@ -126,7 +126,7 @@ export default function DCCSRegistration() {
         .select()
         .single();
 
-      if (certError) throw certError;
+      if (certError || !certificate) throw certError || new Error('Certificate insert returned no data');
 
       // Parse structured code components
       const codeParts = dccsCode.split('-');

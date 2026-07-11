@@ -71,39 +71,6 @@ export default function UploadModal({ onClose }: UploadModalProps) {
     setSnippetRanges(ranges);
   };
 
-  // const handleAiAnalysis = async () => {
-    console.log('Starting AI analysis');
-    setLoading(true);
-    
-    addNotification({
-      type: 'info',
-      title: 'AI Analysis Started',
-      message: 'Analyzing your track for optimal snippets...'
-    });
-    
-    // Simulate AI analysis
-    setTimeout(() => {
-      console.log('AI analysis completed');
-      setAiAnalysis({
-        bestClips: [
-          { start: 45, duration: 15, confidence: 0.95, reason: 'Chorus with strong hook' },
-          { start: 75, duration: 30, confidence: 0.87, reason: 'Bridge section with unique elements' },
-          { start: 15, duration: 20, confidence: 0.82, reason: 'Intro with memorable melody' }
-        ],
-        detectedMoods: ['energetic', 'upbeat', 'catchy'],
-        suggestedBPM: 128,
-        recommendedPrice: 0.12
-      });
-      setPrice('0.12');
-      setLoading(false);
-      setStep(2);
-      addNotification({
-        type: 'success',
-        title: 'AI Analysis Complete',
-        message: 'Found optimal snippet ranges for your track'
-      });
-    }, 3000);
-  };
 
   const handleSubmit = async () => {
     console.log('Starting snippet submission process');

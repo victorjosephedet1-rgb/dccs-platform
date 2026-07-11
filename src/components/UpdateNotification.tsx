@@ -91,11 +91,15 @@ export default function UpdateNotification() {
         return;
       }
 
-      const hasUpdate = latestDeployment.version_number !== currentVersion.version;
+      // Only show if both versions are valid strings and genuinely differ
+      const remoteVersion = latestDeployment.version_number;
+      const localVersion  = currentVersion?.version;
+      if (!remoteVersion || !localVersion) return;
+      if (remoteVersion === localVersion) return;
 
-      if (hasUpdate && !isDismissed) {
+      if (!isDismissed) {
         setUpdateInfo({
-          version: latestDeployment.version_number,
+          version: remoteVersion,
           message: latestDeployment.changes_summary?.description || 'New features and improvements available',
           deployedAt: latestDeployment.deployed_at,
           hasUpdate: true,

@@ -166,7 +166,7 @@ export class DCCSIdentifierService {
       .from('dccs_structured_identifiers')
       .select('*')
       .eq('certificate_id', certificateId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) return null;
 
@@ -195,7 +195,7 @@ export class DCCSIdentifierService {
       .from('dccs_structured_identifiers')
       .select('certificate_id')
       .eq('structured_code', code)
-      .single();
+      .maybeSingle();
 
     if (error || !data) return null;
     return data.certificate_id;
@@ -222,7 +222,7 @@ export class DCCSIdentifierService {
           .from('uploads')
           .select('file_type')
           .eq('dccs_certificate_id', cert.id)
-          .single();
+          .maybeSingle();
 
         if (upload?.file_type && cert.content_fingerprint) {
           await this.createStructuredIdentifier(

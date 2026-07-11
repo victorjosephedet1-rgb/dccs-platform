@@ -41,7 +41,7 @@ export class DCCSIntegrationService {
         .from('uploads')
         .select('id, file_type, file_url, storage_path, dccs_certificate_id')
         .eq('id', uploadId)
-        .single();
+        .maybeSingle();
 
       if (!upload) {
         throw new Error('Upload not found');
@@ -96,7 +96,7 @@ export class DCCSIntegrationService {
         .from('dccs_structured_identifiers')
         .select('id')
         .eq('certificate_id', certificateId)
-        .single();
+        .maybeSingle();
 
       const fingerprintId = await enhancedFingerprintService.storeStructuredFingerprint(
         certificateId,
@@ -139,7 +139,7 @@ export class DCCSIntegrationService {
       .from('dccs_certificates')
       .select('*')
       .eq('id', certificateId)
-      .single();
+      .maybeSingle();
 
     if (!certificate) return null;
 
@@ -147,13 +147,13 @@ export class DCCSIntegrationService {
       .from('dccs_structured_identifiers')
       .select('*')
       .eq('certificate_id', certificateId)
-      .single();
+      .maybeSingle();
 
     const { data: fingerprintData } = await supabase
       .from('dccs_fingerprint_data')
       .select('*')
       .eq('certificate_id', certificateId)
-      .single();
+      .maybeSingle();
 
     const { data: verifications } = await supabase
       .from('dccs_verification_matches')
@@ -178,7 +178,7 @@ export class DCCSIntegrationService {
       .from('dccs_certificates')
       .select('has_enhanced_fingerprint')
       .eq('id', certificateId)
-      .single();
+      .maybeSingle();
 
     return data?.has_enhanced_fingerprint || false;
   }
@@ -198,7 +198,7 @@ export class DCCSIntegrationService {
         .from('dccs_certificates')
         .select('*')
         .eq('id', certificateId)
-        .single();
+        .maybeSingle();
 
       if (!certificate) {
         throw new Error('Certificate not found');
@@ -212,7 +212,7 @@ export class DCCSIntegrationService {
         .from('uploads')
         .select('file_type')
         .eq('dccs_certificate_id', certificateId)
-        .single();
+        .maybeSingle();
 
       if (!upload) {
         throw new Error('Associated upload not found');
@@ -234,7 +234,7 @@ export class DCCSIntegrationService {
         .from('dccs_structured_identifiers')
         .select('id')
         .eq('certificate_id', certificateId)
-        .single();
+        .maybeSingle();
 
       const arrayBuffer = await audioFile.arrayBuffer();
       const basicFingerprint = await audioFingerprintEngine.generateFingerprint(arrayBuffer, {

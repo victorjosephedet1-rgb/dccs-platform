@@ -1,4 +1,5 @@
 export interface ContractAddresses {
+  DCCSRoyaltySplitter: string;
   RoyaltySplitter: string;
   DCCSRegistry: string;
   LicenseNFT: string;

@@ -1,297 +1,250 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LogIn, Mail, Lock, Shield } from 'lucide-react';
+import { LogIn, Mail, Lock, Shield, ArrowRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 export default function Login() {
   const { t } = useTranslation();
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [role, setRole] = useState<'artist' | 'creator'>('creator');
-  const [loading, setLoading] = useState(false);
-  const [useOTP, setUseOTP] = useState(true); // OTP is default - fast and easy!
-  const [otpSent, setOtpSent] = useState(false);
+  const [role, setRole]         = useState<'artist' | 'creator'>('creator');
+  const [loading, setLoading]   = useState(false);
+  const [useOTP, setUseOTP]     = useState(true);
+  const [otpSent, setOtpSent]   = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const { login, loginWithOTP, verifyOTP, user } = useAuth();
+  const { login, loginWithOTP, user } = useAuth();
   const navigate = useNavigate();
+  const { track } = useAnalytics();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (loading) {
-      console.log('[AUTH] Submit ignored - already processing');
-      return;
-    }
-
-    if (!email || !email.trim()) {
-      console.log('[AUTH] Submit ignored - email is empty');
-      return;
-    }
-
-    if (!useOTP && (!password || !password.trim())) {
-      console.log('[AUTH] Submit ignored - password is empty');
-      return;
-    }
-
+    if (loading || !email.trim()) return;
+    if (!useOTP && !password.trim()) return;
     setLoading(true);
-
     try {
       if (useOTP) {
-        console.log('[AUTH] Requesting magic link for:', email);
         await loginWithOTP(email);
         setOtpSent(true);
         setCountdown(60);
-        console.log('[AUTH] Magic link sent successfully');
       } else {
-        console.log('[AUTH] Logging in with password for:', email);
         await login(email, password, role);
-        console.log('[AUTH] Login successful');
+        track('login_success', 'User logged in', { method: 'password' });
       }
-    } catch (error) {
-      console.error('[AUTH ERROR] Login failed:', error);
+    } catch (err) {
+      console.error('[AUTH ERROR]', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Countdown timer for resend button
   React.useEffect(() => {
     if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+      return () => clearTimeout(t);
     }
   }, [countdown]);
 
-  // Redirect after successful login
   React.useEffect(() => {
-    if (user) {
-      navigate('/upload');
-    }
+    if (user) navigate('/upload');
   }, [user, navigate]);
 
+  const BRAND = '#FF5A1F';
+  const BRAND_ALPHA = 'rgba(255, 90, 31, 0.15)';
+  const BRAND_BORDER = 'rgba(255, 90, 31, 0.3)';
+
   return (
-    <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 min-h-[80vh]">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:py-16">
+      <div className="w-full max-w-sm sm:max-w-md">
+
+        {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-3 mb-3">
-            <LogIn className="h-8 w-8" style={{ color: '#FF5A1F' }} />
-            <h2 className="text-3xl font-bold text-white">{t('auth.login.title')}</h2>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4" style={{ background: BRAND_ALPHA, border: `1px solid ${BRAND_BORDER}` }}>
+            <LogIn className="h-5 w-5" style={{ color: BRAND }} />
           </div>
-          <p className="text-slate-400">{t('auth.login.subtitle')}</p>
-          <div className="mt-4 p-3 rounded-lg" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-            <div className="flex items-start space-x-2">
-              <Shield className="h-5 w-5 text-emerald-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-emerald-200 text-sm font-medium mb-1">
-                  Instant Login with Magic Link
-                </p>
-                <p className="text-emerald-200/80 text-xs">
-                  Enter your email and we'll send you a secure login link - no passwords needed!
-                </p>
-              </div>
-            </div>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+            {t('auth.login.title', 'Sign In')}
+          </h1>
+          <p className="text-neutral-400 text-sm sm:text-base">
+            {t('auth.login.subtitle', 'Access your DCCS dashboard')}
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            {/* Role Selection */}
+        {/* Magic link notice */}
+        {useOTP && !otpSent && (
+          <div
+            className="mb-6 p-3.5 rounded-xl flex items-start gap-3"
+            style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}
+          >
+            <Shield className="h-4.5 w-4.5 text-emerald-400 mt-0.5 flex-shrink-0" style={{ width: '1.125rem', height: '1.125rem' }} />
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">{t('auth.login.roleSelection')}</label>
-              <div className="flex space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setRole('creator')}
-                  className="flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 font-medium"
-                  style={{
-                    borderColor: role === 'creator' ? '#FF5A1F' : 'rgba(255, 255, 255, 0.2)',
-                    background: role === 'creator' ? 'rgba(255, 90, 31, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                    color: role === 'creator' ? '#fff' : 'rgba(255, 255, 255, 0.5)'
-                  }}
-                >
-                  {t('auth.login.contentCreator')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('artist')}
-                  className="flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 font-medium"
-                  style={{
-                    borderColor: role === 'artist' ? '#FF5A1F' : 'rgba(255, 255, 255, 0.2)',
-                    background: role === 'artist' ? 'rgba(255, 90, 31, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                    color: role === 'artist' ? '#fff' : 'rgba(255, 255, 255, 0.5)'
-                  }}
-                >
-                  {t('auth.login.musicArtist')}
-                </button>
+              <p className="text-emerald-300 text-sm font-semibold mb-0.5">Instant Login with Magic Link</p>
+              <p className="text-emerald-300/70 text-xs leading-relaxed">
+                Enter your email and we'll send you a secure login link — no password needed.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Magic link sent state */}
+        {otpSent ? (
+          <div
+            className="rounded-2xl p-6 sm:p-8 text-center"
+            style={{ background: 'rgba(16,185,129,0.08)', border: '2px solid rgba(16,185,129,0.25)' }}
+          >
+            <div
+              className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
+              style={{ background: 'rgba(16,185,129,0.15)' }}
+            >
+              <Mail className="w-7 h-7 text-emerald-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Magic Link Sent!</h3>
+            <p className="text-emerald-300/80 text-sm mb-3">We sent a secure login link to:</p>
+            <p className="text-white font-semibold mb-5 break-all">{email}</p>
+
+            <div className="rounded-xl p-4 mb-5 text-left" style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <p className="text-emerald-300/80 text-sm font-semibold mb-2">Next steps:</p>
+              <ol className="text-emerald-300/60 text-sm space-y-1.5">
+                <li>1. Check your email inbox</li>
+                <li>2. Click the "Log In" button in the email</li>
+                <li>3. You'll be signed in automatically</li>
+              </ol>
+            </div>
+            <p className="text-emerald-300/50 text-xs mb-5">Link expires in 60 minutes. Check spam if needed.</p>
+
+            <button
+              onClick={() => { setOtpSent(false); setCountdown(0); }}
+              disabled={countdown > 0}
+              className="w-full py-2.5 text-sm font-medium rounded-lg transition-colors min-h-[44px]"
+              style={{
+                color: countdown > 0 ? 'rgba(52,211,153,0.4)' : '#34D399',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                cursor: countdown > 0 ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {countdown > 0 ? `Resend in ${countdown}s` : 'Send a new link'}
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+
+            {/* Role selector */}
+            <div>
+              <label className="block text-sm font-medium text-neutral-300 mb-2.5">
+                {t('auth.login.roleSelection', 'I am a')}
+              </label>
+              <div className="grid grid-cols-2 gap-2.5">
+                {(['creator', 'artist'] as const).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className="py-3 px-3 rounded-xl border-2 transition-all duration-150 font-medium text-sm min-h-[48px]"
+                    style={{
+                      borderColor: role === r ? BRAND : 'rgba(255,255,255,0.12)',
+                      background: role === r ? BRAND_ALPHA : 'rgba(255,255,255,0.04)',
+                      color: role === r ? '#fff' : 'rgba(255,255,255,0.45)',
+                    }}
+                  >
+                    {r === 'creator'
+                      ? t('auth.login.contentCreator', 'Content Creator')
+                      : t('auth.login.musicArtist', 'Music Artist')
+                    }
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                {t('auth.login.emailAddress')}
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-300 mb-2">
+                {t('auth.login.emailAddress', 'Email address')}
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="form-field-icon">
+                <Mail className="icon" style={{ color: 'rgba(148,163,184,0.6)' }} />
                 <input
                   id="email"
-                  name="email"
                   type="email"
+                  autoComplete="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 bg-white/10 backdrop-blur-lg rounded-lg text-white placeholder-slate-400 focus:outline-none"
-                  style={{ border: '1px solid rgba(255, 255, 255, 0.2)' }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#FF5A1F';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(255, 90, 31, 0.2)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                  placeholder={t('auth.login.enterEmail')}
+                  placeholder={t('auth.login.enterEmail', 'Enter your email')}
+                  className="form-field"
+                  style={{ paddingLeft: '2.75rem' }}
                 />
               </div>
             </div>
 
-            {/* OTP or Password */}
-            {useOTP ? (
-              <>
-                {otpSent && (
-                  <div className="space-y-3">
-                    <div className="rounded-lg p-6 text-center" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '2px solid rgba(16, 185, 129, 0.3)' }}>
-                      <Mail className="w-16 h-16 mx-auto mb-4 text-emerald-400" />
-                      <p className="text-emerald-200 text-lg font-semibold mb-2">
-                        Magic Link Sent!
-                      </p>
-                      <p className="text-emerald-200 text-sm mb-3">
-                        We sent a secure login link to:
-                      </p>
-                      <p className="text-white text-base font-medium mb-4">
-                        {email}
-                      </p>
-                      <div className="bg-white/5 rounded-lg p-4 mb-4">
-                        <p className="text-emerald-200/80 text-sm mb-2">
-                          <strong>Next Steps:</strong>
-                        </p>
-                        <ol className="text-left text-emerald-200/70 text-xs space-y-2">
-                          <li>1. Check your email inbox</li>
-                          <li>2. Click the "Log In" button in the email</li>
-                          <li>3. You'll be logged in automatically</li>
-                        </ol>
-                      </div>
-                      <p className="text-emerald-200/60 text-xs">
-                        Link expires in 60 minutes. Check spam if you don't see it.
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
+            {/* Password (when not using OTP) */}
+            {!useOTP && (
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                  {t('common.password')}
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-neutral-300">
+                    {t('common.password', 'Password')}
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs transition-colors hover:opacity-80"
+                    style={{ color: BRAND }}
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="form-field-icon">
+                  <Lock className="icon" style={{ color: 'rgba(148,163,184,0.6)' }} />
                   <input
                     id="password"
-                    name="password"
                     type="password"
+                    autoComplete="current-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-3 py-3 bg-white/10 backdrop-blur-lg rounded-lg text-white placeholder-slate-400 focus:outline-none"
-                    style={{ border: '1px solid rgba(255, 255, 255, 0.2)' }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#FF5A1F';
-                      e.target.style.boxShadow = '0 0 0 2px rgba(255, 90, 31, 0.2)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                    placeholder={t('auth.login.enterPassword')}
+                    placeholder={t('auth.login.enterPassword', 'Enter your password')}
+                    className="form-field"
+                    style={{ paddingLeft: '2.75rem' }}
                   />
                 </div>
               </div>
             )}
-          </div>
 
-          {!(useOTP && otpSent) && (
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 text-white rounded-lg font-medium focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              style={{ background: '#FF5A1F' }}
-              onMouseEnter={(e) => !loading && (e.currentTarget.style.opacity = '0.9')}
-              onMouseLeave={(e) => !loading && (e.currentTarget.style.opacity = '1')}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white transition-all duration-200 min-h-[52px]"
+              style={{
+                background: BRAND,
+                opacity: loading ? 0.65 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer',
+              }}
             >
-              {loading ?
-                (useOTP && !otpSent ? 'Sending Magic Link...' : 'Signing In...') :
-                (useOTP && !otpSent ? 'Send Magic Link' : 'Sign In')
+              {loading
+                ? <><span className="spinner" style={{ borderTopColor: '#fff', width: '1.125rem', height: '1.125rem' }} /><span>Sending...</span></>
+                : <><span>{useOTP ? 'Send Magic Link' : 'Sign In'}</span><ArrowRight className="h-4 w-4" /></>
               }
             </button>
-          )}
 
-          {otpSent && (
-            <button
-              type="button"
-              onClick={() => {
-                if (countdown === 0) {
-                  setOtpSent(false);
-                  setOtp('');
-                  setCountdown(60);
-                }
-              }}
-              disabled={countdown > 0}
-              className="w-full py-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {countdown > 0
-                ? `Resend link in ${countdown}s`
-                : 'Send new link'}
-            </button>
-          )}
-
-          <div className="text-center space-y-2">
-            <button
-              type="button"
-              onClick={() => {
-                setUseOTP(!useOTP);
-                setOtpSent(false);
-                setOtp('');
-              }}
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              {useOTP ? 'Use password instead' : 'Use magic link instead'}
-            </button>
-            {!useOTP && (
-              <div>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm transition-colors"
-                  style={{ color: '#FF5A1F' }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-            )}
-            <p className="text-slate-400">
-              {t('auth.login.noAccount')}{' '}
-              <Link to="/register" className="transition-colors" style={{ color: '#FF5A1F' }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            {/* Toggle OTP/password */}
+            <div className="text-center space-y-3">
+              <button
+                type="button"
+                onClick={() => { setUseOTP(!useOTP); setOtpSent(false); }}
+                className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors"
               >
-                {t('auth.login.signUpHere')}
-              </Link>
-            </p>
-          </div>
-        </form>
+                {useOTP ? 'Use password instead' : 'Use magic link instead'}
+              </button>
+              <p className="text-neutral-500 text-sm">
+                {t('auth.login.noAccount', "Don't have an account?")}{' '}
+                <Link to="/register" className="font-medium hover:opacity-80 transition-opacity" style={{ color: BRAND }}>
+                  {t('auth.login.signUpHere', 'Sign up here')}
+                </Link>
+              </p>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

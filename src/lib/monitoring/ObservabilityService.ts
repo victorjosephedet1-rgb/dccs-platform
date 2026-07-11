@@ -199,7 +199,7 @@ export class ObservabilityService {
 
     try {
       let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
-      let details = {};
+      const details = {};
 
       switch (service) {
         case 'database':

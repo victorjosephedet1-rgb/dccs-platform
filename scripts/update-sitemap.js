@@ -42,28 +42,31 @@ const currentDate = new Date().toISOString().split('T')[0];
 const routes = [
   // High priority pages
   { path: '/', priority: 1.0, changefreq: 'daily' },
-  { path: '/demo', priority: 0.95, changefreq: 'daily' },
   { path: '/upload', priority: 0.95, changefreq: 'daily' },
+  { path: '/marketplace', priority: 0.95, changefreq: 'daily' },
   { path: '/register', priority: 0.95, changefreq: 'daily' },
-  { path: '/downloads', priority: 0.9, changefreq: 'daily' },
 
   // DCCS System pages
   { path: '/dccs-system', priority: 0.95, changefreq: 'weekly' },
-  { path: '/dccs-registration', priority: 0.95, changefreq: 'daily' },
-  { path: '/dccs-verification', priority: 0.9, changefreq: 'weekly' },
   { path: '/verify', priority: 0.9, changefreq: 'weekly' },
+  { path: '/dccs-registration', priority: 0.9, changefreq: 'weekly' },
+  { path: '/dccs-verification', priority: 0.9, changefreq: 'weekly' },
+
+  // Authenticated user pages
+  { path: '/dashboard', priority: 0.85, changefreq: 'daily' },
+  { path: '/library', priority: 0.8, changefreq: 'weekly' },
+  { path: '/downloads', priority: 0.8, changefreq: 'weekly' },
+  { path: '/search', priority: 0.8, changefreq: 'daily' },
 
   // Information pages
-  { path: '/story', priority: 0.85, changefreq: 'monthly' },
-  { path: '/library', priority: 0.8, changefreq: 'weekly' },
-  { path: '/my-content', priority: 0.8, changefreq: 'weekly' },
-  { path: '/safety', priority: 0.8, changefreq: 'monthly' },
-  { path: '/guidelines', priority: 0.75, changefreq: 'monthly' },
+  { path: '/story', priority: 0.8, changefreq: 'monthly' },
+  { path: '/safety', priority: 0.75, changefreq: 'monthly' },
+  { path: '/guidelines', priority: 0.7, changefreq: 'monthly' },
+  { path: '/careers', priority: 0.65, changefreq: 'monthly' },
 
   // Authentication pages
-  { path: '/login', priority: 0.7, changefreq: 'monthly' },
-  { path: '/careers', priority: 0.7, changefreq: 'monthly' },
-  { path: '/forgot-password', priority: 0.5, changefreq: 'yearly' },
+  { path: '/login', priority: 0.6, changefreq: 'monthly' },
+  { path: '/forgot-password', priority: 0.4, changefreq: 'yearly' },
 ];
 
 // Generate XML sitemap

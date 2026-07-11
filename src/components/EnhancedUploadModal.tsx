@@ -43,7 +43,7 @@ export default function EnhancedUploadModal({ onClose, onSuccess }: EnhancedUplo
   const [duration, setDuration] = useState(180);
   const [price, setPrice] = useState(29.99);
   const [mood, setMood] = useState<string[]>([]);
-  const [, setTags] = useState<string[]>([]);
+  const [tags, _setTags] = useState<string[]>([]);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isExclusive, setIsExclusive] = useState(false);
 

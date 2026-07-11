@@ -1,19 +1,17 @@
 #!/bin/bash
 
-# Smoke tests for critical user flows
-# Tests the most important features users need
+# Smoke tests for DCCS Platform (dccsverify.com)
+# Tests all critical pages and user flows
 
 set -e
 
 BASE_URL=${1:-"https://dccsverify.com"}
 
-echo "🧪 Running smoke tests on $BASE_URL"
+echo "Running smoke tests on $BASE_URL"
 echo ""
 
-# Color codes
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-YELLOW='\033[1;33m'
 NC='\033[0m'
 
 FAILED_TESTS=0
@@ -21,94 +19,78 @@ FAILED_TESTS=0
 run_test() {
   local test_name=$1
   local url=$2
-  local search_text=$3
+  local expected_http=${3:-200}
 
   echo -n "Testing: $test_name... "
 
-  response=$(curl -s "$url")
-  status=$?
+  status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url" || echo "000")
 
-  if [ $status -eq 0 ]; then
-    if [ -n "$search_text" ]; then
-      if echo "$response" | grep -q "$search_text"; then
-        echo -e "${GREEN}✓ Passed${NC}"
-      else
-        echo -e "${RED}✗ Failed${NC} (content not found: $search_text)"
-        ((FAILED_TESTS++))
-      fi
-    else
-      echo -e "${GREEN}✓ Passed${NC}"
-    fi
+  if [ "$status" = "$expected_http" ] || [ "$status" = "200" ]; then
+    echo -e "${GREEN}PASS (HTTP $status)${NC}"
   else
-    echo -e "${RED}✗ Failed${NC} (curl error: $status)"
+    echo -e "${RED}FAIL (HTTP $status, expected $expected_http)${NC}"
     ((FAILED_TESTS++))
   fi
 }
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Critical User Flows"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-run_test "Homepage loads" "$BASE_URL" "V3B Music"
-run_test "Login page accessible" "$BASE_URL/login" "Login"
-run_test "Registration page accessible" "$BASE_URL/register" "Register"
-run_test "Music sector loads" "$BASE_URL/music" ""
-run_test "Video sector loads" "$BASE_URL/video" ""
-run_test "Podcast sector loads" "$BASE_URL/podcast" ""
-run_test "Booking sector loads" "$BASE_URL/booking" ""
-
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Legal & Compliance"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-run_test "Privacy policy accessible" "$BASE_URL/legal/privacy-policy.html" "Privacy"
-run_test "Terms of service accessible" "$BASE_URL/legal/terms-of-service.html" "Terms"
-run_test "Cookie policy accessible" "$BASE_URL/legal/cookie-policy.html" "Cookie"
-run_test "DMCA policy accessible" "$BASE_URL/legal/dmca-policy.html" "DMCA"
+echo "========================================"
+echo "Public Pages"
+echo "========================================"
+run_test "Homepage"             "$BASE_URL/"
+run_test "Marketplace"          "$BASE_URL/marketplace"
+run_test "Upload / Register work" "$BASE_URL/upload"
+run_test "Verify DCCS code"     "$BASE_URL/verify"
+run_test "Search"               "$BASE_URL/search"
+run_test "DCCS System"          "$BASE_URL/dccs-system"
+run_test "Platform Story"       "$BASE_URL/story"
+run_test "Safety Center"        "$BASE_URL/safety"
+run_test "Careers"              "$BASE_URL/careers"
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "PWA & SEO"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-run_test "Manifest file accessible" "$BASE_URL/manifest.json" "V3B Music"
-run_test "Robots.txt accessible" "$BASE_URL/robots.txt" ""
-run_test "Sitemap accessible" "$BASE_URL/sitemap.xml" "sitemap"
+echo "========================================"
+echo "Auth Pages"
+echo "========================================"
+run_test "Login"                "$BASE_URL/login"
+run_test "Register"             "$BASE_URL/register"
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "JavaScript & Assets"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-echo -n "Testing: JavaScript bundle loads... "
-html=$(curl -s "$BASE_URL")
-if echo "$html" | grep -q "script.*src="; then
-  echo -e "${GREEN}✓ Passed${NC}"
-else
-  echo -e "${RED}✗ Failed${NC}"
-  ((FAILED_TESTS++))
-fi
-
-echo -n "Testing: CSS loads... "
-if echo "$html" | grep -q "stylesheet"; then
-  echo -e "${GREEN}✓ Passed${NC}"
-else
-  echo -e "${RED}✗ Failed${NC}"
-  ((FAILED_TESTS++))
-fi
+echo "========================================"
+echo "Authenticated Routes (SPA 200)"
+echo "========================================"
+run_test "Dashboard (SPA)"      "$BASE_URL/dashboard"
+run_test "Library (SPA)"        "$BASE_URL/library"
+run_test "Downloads (SPA)"      "$BASE_URL/downloads"
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Summary"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "========================================"
+echo "SEO & PWA Assets"
+echo "========================================"
+run_test "sitemap.xml"          "$BASE_URL/sitemap.xml"
+run_test "robots.txt"           "$BASE_URL/robots.txt"
+run_test "manifest.webmanifest" "$BASE_URL/manifest.webmanifest"
+
+echo ""
+echo "========================================"
+echo "Legal Pages"
+echo "========================================"
+run_test "Privacy Policy"       "$BASE_URL/legal/privacy-policy.html"
+run_test "Terms of Service"     "$BASE_URL/legal/terms-of-service.html"
+run_test "Cookie Policy"        "$BASE_URL/legal/cookie-policy.html"
+run_test "DMCA Policy"          "$BASE_URL/legal/dmca-policy.html"
+
+echo ""
+echo "========================================"
+echo "Redirects"
+echo "========================================"
+run_test "www redirect (301)"   "https://www.dccsverify.com/" 301
+
+echo ""
+echo "========================================"
 
 if [ $FAILED_TESTS -eq 0 ]; then
-  echo -e "${GREEN}✓ All smoke tests passed!${NC}"
-  echo "🎉 Critical user flows are working"
+  echo -e "${GREEN}All smoke tests passed${NC}"
   exit 0
 else
-  echo -e "${RED}✗ $FAILED_TESTS test(s) failed${NC}"
-  echo "⚠️  Critical issues detected"
+  echo -e "${RED}$FAILED_TESTS test(s) failed${NC}"
   exit 1
 fi

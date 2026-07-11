@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SEOHead, { PAGE_SEO } from '../components/SEOHead';
 import { Shield, Search, CheckCircle, XCircle, AlertTriangle, Clock, User, FileText, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { ClearanceCodeGenerator } from '../lib/dccs/ClearanceCodeGenerator';
@@ -126,6 +127,8 @@ export default function VerifyCode() {
   };
 
   return (
+    <>
+    <SEOHead {...PAGE_SEO.VERIFY} />
     <div className="min-h-screen bg-black relative overflow-hidden">
       <SecureGridPattern className="text-blue-500" />
 
@@ -446,5 +449,6 @@ export default function VerifyCode() {
         </div>
       </div>
     </div>
+    </>
   );
 }

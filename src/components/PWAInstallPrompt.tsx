@@ -94,7 +94,7 @@ export default function PWAInstallPrompt() {
 
           <div className="flex-1">
             <h3 className="font-bold text-white text-lg mb-1">
-              Install V3BMusic.AI
+              Install DCCS App
             </h3>
             <p className="text-slate-300 text-sm mb-3">
               {isIOS

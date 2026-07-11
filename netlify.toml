@@ -1,82 +1,158 @@
 # Digital Creative Copyright System (DCCS)
-# Platform operated by Victor360 Brand Limited
-#
-# DCCS has two meanings:
-# 1. Platform Name: Digital Creative Copyright System - Where creators register digital assets
-# 2. Technology: Digital Clearance Code System - Proprietary ownership verification technology
-#
-# PRIMARY DOMAIN: dccsverify.com
-# LEGACY DOMAIN: v3bmusic.ai (redirects to primary)
+# Operated by Victor360 Brand Limited
+# Primary domain: dccsverify.com
 
-# Redirect v3bmusic.ai to dccsverify.com
+# ──────────────────────────────────────────────────────────────
+# Domain redirects
+# ──────────────────────────────────────────────────────────────
+
 [[redirects]]
-from = "https://v3bmusic.ai/*"
-to = "https://dccsverify.com/:splat"
+from   = "https://v3bmusic.ai/*"
+to     = "https://dccsverify.com/:splat"
 status = 301
-force = true
+force  = true
 
 [[redirects]]
-from = "https://www.v3bmusic.ai/*"
-to = "https://dccsverify.com/:splat"
+from   = "https://www.v3bmusic.ai/*"
+to     = "https://dccsverify.com/:splat"
 status = 301
-force = true
+force  = true
 
-# Redirect www.dccsverify.com to dccsverify.com
 [[redirects]]
-from = "https://www.dccsverify.com/*"
-to = "https://dccsverify.com/:splat"
+from   = "https://www.dccsverify.com/*"
+to     = "https://dccsverify.com/:splat"
 status = 301
-force = true
+force  = true
+
+# Legacy route aliases — permanent redirects to canonical paths
+[[redirects]]
+from   = "/platform-story"
+to     = "/story"
+status = 301
+force  = true
 
 [[redirects]]
-from = "/*"
-to = "/index.html"
+from   = "/verify-code"
+to     = "/verify"
+status = 301
+force  = true
+
+# SPA catch-all — must be last redirect
+[[redirects]]
+from   = "/*"
+to     = "/index.html"
 status = 200
 
+# ──────────────────────────────────────────────────────────────
+# Build configuration
+# ──────────────────────────────────────────────────────────────
+
 [build]
-command = "npm run build"
+command = "npm ci && npm run build"
 publish = "dist"
 
 [build.environment]
-NODE_VERSION = "20"
-SITE_NAME = "Digital Creative Copyright System (DCCS)"
-SITE_DESCRIPTION = "Prove ownership of digital assets with DCCS - Digital Clearance Code System technology. Upload, fingerprint, and receive permanent ownership certificates for audio, video, images, and creative projects."
-COMPANY_NAME = "Victor360 Brand Limited"
+NODE_VERSION    = "20.18.0"
+NPM_FLAGS       = "--prefer-offline"
+SITE_NAME       = "Digital Creative Copyright System (DCCS)"
+COMPANY_NAME    = "Victor360 Brand Limited"
+
+# ──────────────────────────────────────────────────────────────
+# Cache headers — immutable assets (hashed filenames from Vite)
+# ──────────────────────────────────────────────────────────────
 
 [[headers]]
 for = "/assets/*"
-
 [headers.values]
 Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/sw.js"
+[headers.values]
+Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+for = "/manifest.webmanifest"
+[headers.values]
+Cache-Control = "public, max-age=86400"
+
+[[headers]]
+for = "/*.json"
+[headers.values]
+Cache-Control = "public, max-age=3600"
+
+[[headers]]
+for = "/*.xml"
+[headers.values]
+Cache-Control = "public, max-age=3600"
 
 [[headers]]
 for = "/*.ico"
-
 [headers.values]
 Cache-Control = "public, max-age=31536000, immutable"
-Content-Type = "image/x-icon"
+Content-Type  = "image/x-icon"
 
 [[headers]]
 for = "/*.png"
-
 [headers.values]
 Cache-Control = "public, max-age=31536000, immutable"
-Content-Type = "image/png"
+Content-Type  = "image/png"
+
+# ──────────────────────────────────────────────────────────────
+# Security headers — applied to every response
+# ──────────────────────────────────────────────────────────────
 
 [[headers]]
 for = "/*"
-
 [headers.values]
-X-Content-Type-Options = "nosniff"
+# Prevent framing (clickjacking)
 X-Frame-Options = "DENY"
-X-XSS-Protection = "1; mode=block"
-Referrer-Policy = "strict-origin-when-cross-origin"
-Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src https://js.stripe.com; object-src 'none';"
 
-# Site Metadata for Netlify Dashboard
+# Enforce MIME types
+X-Content-Type-Options = "nosniff"
+
+# Legacy XSS filter
+X-XSS-Protection = "1; mode=block"
+
+# Referrer control
+Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Permissions policy — deny dangerous capabilities
+Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), serial=(), nfc=()"
+
+# HSTS — 1 year, include subdomains
+Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Content Security Policy
+# script-src:  own bundles + Stripe.js (required for payment iframe)
+# connect-src: Supabase REST + WebSocket + Stripe API
+# frame-src:   Stripe payment iframe only
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com; img-src 'self' data: blob: https:; font-src 'self' data:; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
+
+# Cross-origin isolation for Wasm/SharedArrayBuffer (future-proof)
+Cross-Origin-Opener-Policy   = "same-origin-allow-popups"
+Cross-Origin-Resource-Policy = "same-site"
+
+# ──────────────────────────────────────────────────────────────
+# Environment: production
+# VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_STRIPE_PUBLISHABLE_KEY
+# must be set in the Netlify dashboard under Site Settings → Environment Variables.
+# Do NOT commit secret values here.
+# ──────────────────────────────────────────────────────────────
+
 [context.production]
-environment = { SITE_NAME = "DCCS - Digital Creative Copyright System", COMPANY = "Victor360 Brand Limited", VITE_SUPABASE_URL = "https://aqpvcvflwihrisjxmlfz.supabase.co", VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxcHZjdmZsd2locmlzanhtbGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODk1NTQsImV4cCI6MjA3ODA2NTU1NH0.L_APR_WUkH6i5Rvg6iZsOyVniVO6ZbXrNlva1ybJIzo", VITE_STRIPE_PUBLISHABLE_KEY = "pk_live_51S7exNB87PioOpgwdVfHLxU6FrCnC1EqK6Gzeet1luRCuIGlIgCn1DcKePmOYOLumaU9JHiXD0Zf7MPANFSZvM5G00GpyJnFlf" }
+environment = { SITE_NAME = "DCCS - Digital Creative Copyright System", COMPANY = "Victor360 Brand Limited", VITE_DEPLOY_ENV = "production" }
+
+# ──────────────────────────────────────────────────────────────
+# Environment: deploy previews (pull requests)
+# ──────────────────────────────────────────────────────────────
 
 [context.deploy-preview]
-environment = { SITE_NAME = "DCCS Preview", COMPANY = "Victor360 Brand Limited", VITE_SUPABASE_URL = "https://aqpvcvflwihrisjxmlfz.supabase.co", VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxcHZjdmZsd2locmlzanhtbGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODk1NTQsImV4cCI6MjA3ODA2NTU1NH0.L_APR_WUkH6i5Rvg6iZsOyVniVO6ZbXrNlva1ybJIzo", VITE_STRIPE_PUBLISHABLE_KEY = "pk_live_51S7exNB87PioOpgwdVfHLxU6FrCnC1EqK6Gzeet1luRCuIGlIgCn1DcKePmOYOLumaU9JHiXD0Zf7MPANFSZvM5G00GpyJnFlf" }
+environment = { SITE_NAME = "DCCS Preview", COMPANY = "Victor360 Brand Limited", VITE_DEPLOY_ENV = "preview" }
+
+# ──────────────────────────────────────────────────────────────
+# Environment: branch deploys (feature branches)
+# ──────────────────────────────────────────────────────────────
+
+[context.branch-deploy]
+environment = { SITE_NAME = "DCCS Branch Deploy", COMPANY = "Victor360 Brand Limited", VITE_DEPLOY_ENV = "branch" }

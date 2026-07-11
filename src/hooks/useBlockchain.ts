@@ -1,13 +1,115 @@
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useWeb3 } from "../contexts/Web3Context";
-import { generateDCCSCode, waitForTransaction } from "../lib/web3/contracts";
+import {
+  generateDCCSCode,
+  waitForTransaction,
+  registerDCCSAsset,
+  getDCCSAsset,
+  distributeDCCSRoyalty,
+  isDCCSHashRegistered
+} from "../lib/web3/contracts";
 import { LicenseData, RoyaltyDistribution, PayoutRecord } from "../shared/types/contracts";
+
+export interface DCCSAsset {
+  dccsHash: string;
+  creator: string;
+  timestamp: bigint;
+  isActive: boolean;
+}
 
 export function useBlockchain() {
   const { contracts, account, signer } = useWeb3();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const registerAsset = async (
+    dccsHash: string
+  ): Promise<{ assetId: bigint; txHash: string } | null> => {
+    if (!contracts?.dccsRoyaltySplitter || !account || !signer) {
+      setError("Wallet not connected");
+      return null;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await registerDCCSAsset(contracts.dccsRoyaltySplitter, account, dccsHash);
+      setIsLoading(false);
+      return result;
+    } catch (err: any) {
+      setError(err.message || "Failed to register asset");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
+  const getAsset = async (assetId: bigint): Promise<DCCSAsset | null> => {
+    if (!contracts?.dccsRoyaltySplitter) {
+      setError("Wallet not connected");
+      return null;
+    }
+
+    try {
+      return await getDCCSAsset(contracts.dccsRoyaltySplitter, assetId);
+    } catch (err: any) {
+      setError(err.message || "Failed to get asset");
+      return null;
+    }
+  };
+
+  const distributeRoyalty = async (
+    assetId: bigint,
+    amountEth: string
+  ): Promise<string | null> => {
+    if (!contracts?.dccsRoyaltySplitter || !signer) {
+      setError("Wallet not connected");
+      return null;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const txHash = await distributeDCCSRoyalty(contracts.dccsRoyaltySplitter, assetId, amountEth);
+      setIsLoading(false);
+      return txHash;
+    } catch (err: any) {
+      setError(err.message || "Failed to distribute royalty");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
+  const checkHashRegistered = async (dccsHash: string): Promise<boolean> => {
+    if (!contracts?.dccsRoyaltySplitter) {
+      return false;
+    }
+    return await isDCCSHashRegistered(contracts.dccsRoyaltySplitter, dccsHash);
+  };
+
+  const getTotalAssets = async (): Promise<bigint | null> => {
+    if (!contracts?.dccsRoyaltySplitter) {
+      return null;
+    }
+    try {
+      return await contracts.dccsRoyaltySplitter.totalAssets();
+    } catch {
+      return null;
+    }
+  };
+
+  const getTreasuryWallet = async (): Promise<string | null> => {
+    if (!contracts?.dccsRoyaltySplitter) {
+      return null;
+    }
+    try {
+      return await contracts.dccsRoyaltySplitter.treasuryWallet();
+    } catch {
+      return null;
+    }
+  };
 
   const registerLicense = async (
     contentHash: string,
@@ -178,6 +280,12 @@ export function useBlockchain() {
     executeInstantPayout,
     getArtistPayouts,
     mintLicense,
+    registerAsset,
+    getAsset,
+    distributeRoyalty,
+    checkHashRegistered,
+    getTotalAssets,
+    getTreasuryWallet,
     isLoading,
     error,
     clearError: () => setError(null),

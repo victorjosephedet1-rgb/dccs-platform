@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, FileAudio, FileVideo, FileImage, FileText, File, AlertCircle, Plus, Shield } from 'lucide-react';
+import { Download, FileAudio, FileVideo, FileImage, FileText, File, Plus, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getBucketForCategory } from '../lib/phase1UploadManager';
+import { useNotifications } from '../components/NotificationSystem';
+import { logger } from '../utils/logger';
 
 interface Upload {
   id: string;
   file_name: string;
   file_type: string;
   file_size: number;
-  file_category: 'audio' | 'video' | 'image' | 'document';
+  file_category: string;
   upload_status: string;
   storage_path: string;
   created_at: string;
@@ -21,8 +24,34 @@ interface DCCSCertificate {
   certificate_id: string;
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function FileIcon({ category }: { category: string }) {
+  const style = { color: '#FF5A1F' };
+  if (category === 'video') return <FileVideo className="h-12 w-12" style={style} />;
+  if (category === 'audio') return <FileAudio className="h-12 w-12" style={style} />;
+  if (category === 'image') return <FileImage className="h-12 w-12" style={style} />;
+  if (category === 'document') return <FileText className="h-12 w-12" style={style} />;
+  return <File className="h-12 w-12" style={style} />;
+}
+
 export default function Phase1Downloads() {
   const navigate = useNavigate();
+  const { addNotification } = useNotifications();
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [certificates, setCertificates] = useState<Record<string, DCCSCertificate>>({});
   const [loading, setLoading] = useState(true);
@@ -42,118 +71,98 @@ export default function Phase1Downloads() {
 
       const { data, error } = await supabase
         .from('uploads')
-        .select('*')
+        .select('id, file_name, file_type, file_size, file_category, upload_status, storage_path, created_at, file_url, dccs_certificate_id')
         .eq('user_id', user.id)
         .eq('upload_status', 'completed')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+
       setUploads(data || []);
 
-      if (data && data.length > 0) {
-        const certificateIds = data
-          .map(u => u.dccs_certificate_id)
-          .filter(Boolean);
+      const certIds = (data || []).map(u => u.dccs_certificate_id).filter(Boolean) as string[];
+      if (certIds.length > 0) {
+        const { data: certsData } = await supabase
+          .from('dccs_certificates')
+          .select('id, clearance_code, certificate_id')
+          .in('id', certIds);
 
-        if (certificateIds.length > 0) {
-          const { data: certsData } = await supabase
-            .from('dccs_certificates')
-            .select('id, clearance_code, certificate_id')
-            .in('id', certificateIds);
-
-          if (certsData) {
-            const certsMap: Record<string, DCCSCertificate> = {};
-            certsData.forEach(cert => {
-              certsMap[cert.id] = {
-                clearance_code: cert.clearance_code,
-                certificate_id: cert.certificate_id
-              };
-            });
-            setCertificates(certsMap);
-          }
+        if (certsData) {
+          const certsMap: Record<string, DCCSCertificate> = {};
+          certsData.forEach(cert => {
+            certsMap[cert.id] = {
+              clearance_code: cert.clearance_code,
+              certificate_id: cert.certificate_id,
+            };
+          });
+          setCertificates(certsMap);
         }
       }
     } catch (error) {
-      console.error('Failed to load uploads:', error);
+      logger.error('[Phase1Downloads] Failed to load uploads:', error);
+      addNotification({ type: 'error', title: 'Load Failed', message: 'Failed to load your files. Please refresh the page.' });
     } finally {
       setLoading(false);
     }
   };
 
   const handleDownload = async (upload: Upload) => {
-    if (downloading === upload.id) {
-      console.log('[DOWNLOAD] Already downloading this file, ignoring duplicate request');
-      return;
-    }
+    if (downloading === upload.id) return;
+
+    setDownloading(upload.id);
 
     try {
-      setDownloading(upload.id);
-      console.log('[DOWNLOAD] Starting download:', { uploadId: upload.id, fileName: upload.file_name });
+      // Use the stored public URL if available, otherwise derive it from bucket + path.
+      // Both audio-files and video-content are public buckets — no signed URL needed.
+      let downloadUrl = upload.file_url;
 
-      const bucketMap: Record<string, string> = {
-        'audio': 'audio-files',
-        'video': 'videos',
-        'image': 'images',
-        'document': 'documents'
-      };
-
-      const bucket = bucketMap[upload.file_category] || 'audio-files';
-      console.log('[DOWNLOAD] Using bucket:', bucket);
-
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .download(upload.storage_path);
-
-      if (error) {
-        console.error('[DOWNLOAD ERROR]', error);
-        throw error;
+      if (!downloadUrl || downloadUrl.trim() === '') {
+        const bucket = getBucketForCategory(upload.file_category);
+        const { data } = supabase.storage.from(bucket).getPublicUrl(upload.storage_path);
+        downloadUrl = data.publicUrl;
       }
 
-      console.log('[DOWNLOAD] File downloaded, creating blob URL');
-      const url = window.URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = upload.file_name;
-      document.body.appendChild(a);
-      a.click();
+      if (!downloadUrl) {
+        throw new Error('Could not resolve download URL for this file.');
+      }
 
+      const response = await fetch(downloadUrl);
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = objectUrl;
+      anchor.download = upload.file_name;
+      document.body.appendChild(anchor);
+      anchor.click();
+
+      // Give the browser 1 second before cleanup — 100ms is too short on slow machines.
       setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }, 100);
+        window.URL.revokeObjectURL(objectUrl);
+        document.body.removeChild(anchor);
+      }, 1000);
 
-      console.log('[DOWNLOAD SUCCESS] File download triggered');
+      addNotification({ type: 'success', title: 'Download Complete', message: `${upload.file_name} downloaded successfully.` });
     } catch (error) {
-      console.error('[DOWNLOAD ERROR] Download failed:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Download failed';
-      alert(`Failed to download file: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
+      logger.error('[Phase1Downloads] Download failed:', error);
+      const message = error instanceof Error ? error.message : 'Download failed. Please try again.';
+      addNotification({ type: 'error', title: 'Download Failed', message });
     } finally {
       setDownloading(null);
     }
-  };
-
-  const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
   };
 
   if (loading) {
     return (
       <div className="min-h-screen text-white flex items-center justify-center" style={{ background: '#0B0F17' }}>
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-r-transparent mb-4" style={{ borderColor: '#FF5A1F', borderRightColor: 'transparent' }}></div>
+          <div
+            className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid mb-4"
+            style={{ borderColor: '#FF5A1F', borderRightColor: 'transparent' }}
+          />
           <p className="text-slate-400">Loading your files...</p>
         </div>
       </div>
@@ -184,12 +193,13 @@ export default function Phase1Downloads() {
         </div>
 
         {uploads.length === 0 ? (
-          <div className="bg-black/40 rounded-xl p-12 text-center" style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+          <div
+            className="bg-black/40 rounded-xl p-12 text-center"
+            style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
+          >
             <FileAudio className="h-16 w-16 mx-auto mb-4" style={{ color: 'rgba(255, 255, 255, 0.3)' }} />
             <h3 className="text-xl font-semibold mb-2">No Files Yet</h3>
-            <p className="text-slate-400 mb-6">
-              Upload your first file to get started
-            </p>
+            <p className="text-slate-400 mb-6">Upload your first file to get started</p>
             <button
               onClick={() => navigate('/upload')}
               className="inline-flex items-center space-x-2 px-6 py-3 rounded-full font-semibold transition-all hover:opacity-90"
@@ -201,72 +211,86 @@ export default function Phase1Downloads() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {uploads.map((upload) => (
-              <div
-                key={upload.id}
-                className="bg-black/40 rounded-xl p-6 transition-all"
-                style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
-                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(255, 90, 31, 0.5)'}
-                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4 flex-1 min-w-0">
-                    <div className="flex-shrink-0">
-                      {upload.file_category === 'video' && <FileVideo className="h-12 w-12" style={{ color: '#FF5A1F' }} />}
-                      {upload.file_category === 'audio' && <FileAudio className="h-12 w-12" style={{ color: '#FF5A1F' }} />}
-                      {upload.file_category === 'image' && <FileImage className="h-12 w-12" style={{ color: '#FF5A1F' }} />}
-                      {upload.file_category === 'document' && <FileText className="h-12 w-12" style={{ color: '#FF5A1F' }} />}
-                      {!['video', 'audio', 'image', 'document'].includes(upload.file_category) && <File className="h-12 w-12" style={{ color: '#FF5A1F' }} />}
-                    </div>
+            {uploads.map((upload) => {
+              const cert = upload.dccs_certificate_id
+                ? certificates[upload.dccs_certificate_id]
+                : null;
+              const isDownloading = downloading === upload.id;
 
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold truncate mb-1">
-                        {upload.file_name}
-                      </h3>
-                      <div className="flex items-center space-x-4 text-sm text-slate-400 mb-2">
-                        <span>{formatBytes(upload.file_size)}</span>
-                        <span>{formatDate(upload.created_at)}</span>
-                        <span className="capitalize">{upload.file_category}</span>
+              return (
+                <div
+                  key={upload.id}
+                  className="bg-black/40 rounded-xl p-6 transition-all"
+                  style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 90, 31, 0.5)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4 flex-1 min-w-0">
+                      <div className="flex-shrink-0">
+                        <FileIcon category={upload.file_category} />
                       </div>
-                      {upload.dccs_certificate_id && certificates[upload.dccs_certificate_id] && (
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22C55E', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
-                          <Shield className="h-3 w-3" />
-                          <span>DCCS: {certificates[upload.dccs_certificate_id].clearance_code}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
 
-                  <button
-                    onClick={() => handleDownload(upload)}
-                    disabled={downloading === upload.id}
-                    className="ml-4 inline-flex items-center space-x-2 px-6 py-3 rounded-full font-semibold transition-all"
-                    style={{
-                      background: downloading === upload.id ? 'rgba(255, 255, 255, 0.1)' : '#FF5A1F',
-                      color: downloading === upload.id ? 'rgba(255, 255, 255, 0.5)' : '#fff',
-                      cursor: downloading === upload.id ? 'wait' : 'pointer',
-                      opacity: downloading === upload.id ? 0.6 : 1
-                    }}
-                  >
-                    {downloading === upload.id ? (
-                      <>
-                        <div className="h-5 w-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'rgba(255, 255, 255, 0.5)' }} />
-                        <span>Downloading...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Download className="h-5 w-5" />
-                        <span>Download</span>
-                      </>
-                    )}
-                  </button>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold truncate mb-1">{upload.file_name}</h3>
+                        <div className="flex items-center space-x-4 text-sm text-slate-400 mb-2">
+                          <span>{formatBytes(upload.file_size)}</span>
+                          <span>{formatDate(upload.created_at)}</span>
+                          <span className="capitalize">{upload.file_category}</span>
+                        </div>
+                        {cert && (
+                          <div
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold"
+                            style={{
+                              background: 'rgba(34, 197, 94, 0.15)',
+                              color: '#22C55E',
+                              border: '1px solid rgba(34, 197, 94, 0.3)',
+                            }}
+                          >
+                            <Shield className="h-3 w-3" />
+                            <span>DCCS: {cert.clearance_code}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDownload(upload)}
+                      disabled={isDownloading}
+                      className="ml-4 inline-flex items-center space-x-2 px-6 py-3 rounded-full font-semibold transition-all"
+                      style={{
+                        background: isDownloading ? 'rgba(255, 255, 255, 0.1)' : '#FF5A1F',
+                        color: isDownloading ? 'rgba(255, 255, 255, 0.5)' : '#fff',
+                        cursor: isDownloading ? 'wait' : 'pointer',
+                        opacity: isDownloading ? 0.6 : 1,
+                      }}
+                    >
+                      {isDownloading ? (
+                        <>
+                          <div
+                            className="h-5 w-5 border-2 border-t-transparent rounded-full animate-spin"
+                            style={{ borderColor: 'rgba(255, 255, 255, 0.5)' }}
+                          />
+                          <span>Downloading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-5 w-5" />
+                          <span>Download</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
-        <div className="mt-12 rounded-xl p-6" style={{ background: 'rgba(255, 90, 31, 0.1)', border: '1px solid rgba(255, 90, 31, 0.2)' }}>
+        <div
+          className="mt-12 rounded-xl p-6"
+          style={{ background: 'rgba(255, 90, 31, 0.1)', border: '1px solid rgba(255, 90, 31, 0.2)' }}
+        >
           <div className="flex items-start space-x-4">
             <Shield className="h-6 w-6 flex-shrink-0 mt-1" style={{ color: '#FF5A1F' }} />
             <div>

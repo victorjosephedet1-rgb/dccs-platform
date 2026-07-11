@@ -422,19 +422,22 @@ export class BlockchainVerificationService {
 }
 
 export function createBlockchainService(network: 'polygon' | 'polygon-mumbai' = 'polygon'): BlockchainVerificationService {
+  // Private key is never exposed to the frontend bundle.
+  // Blockchain write operations that require signing must be proxied
+  // through a Supabase Edge Function with the key stored server-side.
   const configs: Record<string, BlockchainConfig> = {
     polygon: {
       network: 'polygon',
       rpcUrl: 'https://polygon-rpc.com',
       chainId: 137,
-      privateKey: import.meta.env.VITE_BLOCKCHAIN_PRIVATE_KEY,
+      privateKey: '',
       contractAddress: import.meta.env.VITE_DCCS_CONTRACT_ADDRESS
     },
     'polygon-mumbai': {
       network: 'polygon-mumbai',
       rpcUrl: 'https://rpc-mumbai.maticvigil.com',
       chainId: 80001,
-      privateKey: import.meta.env.VITE_BLOCKCHAIN_PRIVATE_KEY,
+      privateKey: '',
       contractAddress: import.meta.env.VITE_DCCS_CONTRACT_ADDRESS
     }
   };

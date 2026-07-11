@@ -303,7 +303,6 @@ export default function GlobalRoyaltyTracking({ artistId }: GlobalRoyaltyTrackin
           </div>
           <button 
             onClick={() => {
-              console.log('Exporting global royalty report for artist:', artistId);
               addNotification({
                 type: 'success',
                 title: 'Report Exported',

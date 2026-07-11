@@ -125,7 +125,7 @@ export class DistortionTolerantVerification {
       .from('dccs_certificates')
       .select('id, clearance_code, structured_code')
       .or(`clearance_code.eq.${dccsCode},structured_code.eq.${dccsCode}`)
-      .single();
+      .maybeSingle();
 
     if (!certificate) {
       return null;
@@ -135,7 +135,7 @@ export class DistortionTolerantVerification {
       .from('dccs_fingerprint_data')
       .select('*')
       .eq('certificate_id', certificate.id)
-      .single();
+      .maybeSingle();
 
     if (!fingerprintData) {
       return null;

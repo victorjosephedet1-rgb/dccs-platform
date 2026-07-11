@@ -8,7 +8,53 @@
 
 ---
 
-## 🛡️ What is DCCS?
+## Deployment
+
+**Production URL**: [dccsverify.com](https://dccsverify.com)
+
+### How to deploy
+
+```bash
+# 1. Make your changes locally
+# 2. Commit
+git add .
+git commit -m "your message"
+
+# 3. Push to main
+git push origin main
+```
+
+That's it. Pushing to `main` automatically:
+1. Triggers **GitHub Actions** — builds the project
+2. Deploys to **Netlify** — goes live at dccsverify.com
+
+### CI pipeline (pull requests)
+
+Opening a pull request against `main` runs:
+- Lint
+- Type check
+- Production build
+
+All checks must pass before merging.
+
+### What NOT to use
+
+There are no batch files, no Task Scheduler tasks, no `.ready-to-deploy` flags.
+The only deployment mechanism is `git push origin main`.
+
+### Required GitHub Secrets
+
+| Secret | Purpose |
+|---|---|
+| `NETLIFY_AUTH_TOKEN` | Netlify deploy authentication |
+| `NETLIFY_SITE_ID` | Netlify site identifier |
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase public key |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
+
+---
+
+## What is DCCS?
 
 **DCCS (Digital Clearance Code System)** is both a technology and a platform:
 

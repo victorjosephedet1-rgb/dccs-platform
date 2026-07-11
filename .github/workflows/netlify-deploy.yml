@@ -2,129 +2,164 @@ name: Deploy to Netlify
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main]
   workflow_dispatch:
+    inputs:
+      reason:
+        description: Manual deploy reason
+        required: false
+        default: Manual trigger
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20.18.0'
+  PRODUCTION_URL: 'https://dccsverify.com'
 
 jobs:
-  deploy:
+  install:
+    name: Install
     runs-on: ubuntu-latest
-    name: Deploy DCCS Platform to Netlify
-
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.value }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Compute cache key
+        id: cache-key
+        run: echo "value=node-modules-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore node_modules cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ steps.cache-key.outputs.value }}
 
       - name: Install dependencies
-        run: npm ci
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline
 
-      - name: Build application
+  build:
+    name: Build
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.install.outputs.cache-key }}
+
+      - name: Build production bundle
         run: npm run build
         env:
+          NODE_ENV: production
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_APP_VERSION: ${{ github.sha }}
+
+      - name: Assert build output
+        run: |
+          test -d dist            || { echo "FAIL: dist/ missing"; exit 1; }
+          test -f dist/index.html || { echo "FAIL: dist/index.html missing"; exit 1; }
+          echo "Build size: $(du -sh dist | cut -f1)"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 14
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ env.PRODUCTION_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: './dist'
+          publish-dir: ./dist
           production-branch: main
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions - ${{ github.event.head_commit.message }}"
-          enable-pull-request-comment: true
+          deploy-message: |
+            ${{ github.event.head_commit.message || inputs.reason }}
+            Commit: ${{ github.sha }}
+          enable-pull-request-comment: false
           enable-commit-comment: true
-          overwrites-pull-request-comment: true
+          fails-without-url: true
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 10
 
-      - name: Health check deployment
-        if: success()
-        run: |
-          echo "Waiting for deployment to be live..."
-          sleep 10
-          
-          echo "Running health checks..."
-          HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://dccsverify.com || echo "000")
-          
-          if [ "$HEALTH_STATUS" = "200" ]; then
-            echo "✅ Site is live and responding"
-          else
-            echo "⚠️ Site returned status: $HEALTH_STATUS"
-          fi
+  validate:
+    name: Post-Deploy Check
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for CDN propagation
+        run: sleep 30
 
-      - name: Notify deployment webhook
-        if: success()
+      - name: Health check (with retry)
         run: |
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          curl -X POST "${{ secrets.VITE_SUPABASE_URL }}/functions/v1/github-deployment-webhook" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
-            -d '{
-              "event": "deployment",
-              "status": "success",
-              "commit": "${{ github.sha }}",
-              "branch": "${{ github.ref_name }}",
-              "message": "${{ github.event.head_commit.message }}",
-              "author": "${{ github.actor }}",
-              "url": "https://dccsverify.com",
-              "timestamp": "'"$TIMESTAMP"'",
-              "workflow_run_id": "${{ github.run_id }}",
-              "repository": "${{ github.repository }}"
-            }' || echo "⚠️ Webhook notification failed (non-critical)"
+          MAX=5
+          DELAY=15
+          for i in $(seq 1 $MAX); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "${{ env.PRODUCTION_URL }}" || echo "000")
+            echo "Attempt $i/$MAX — HTTP $STATUS — ${{ env.PRODUCTION_URL }}"
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ]; then
+              echo "Health check passed"
+              exit 0
+            fi
+            [ "$i" -lt "$MAX" ] && sleep $DELAY
+          done
+          echo "FAIL: site returned $STATUS after $MAX attempts"
+          exit 1
 
-      - name: Create deployment summary
-        if: success()
+      - name: Ping Google Search Console
         run: |
-          echo "## 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ✅ Your changes are now LIVE" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Deployment Details" >> $GITHUB_STEP_SUMMARY
-          echo "- **Live Site**: [dccsverify.com](https://dccsverify.com)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Platform**: Digital Creative Copyright System (DCCS)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Author**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Message**: ${{ github.event.head_commit.message }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Deployed**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Quick Links" >> $GITHUB_STEP_SUMMARY
-          echo "- 🌐 [View Live Site](https://dccsverify.com)" >> $GITHUB_STEP_SUMMARY
-          echo "- 📄 [Version Info](https://dccsverify.com/version.json)" >> $GITHUB_STEP_SUMMARY
-          echo "- 🗺️ [Sitemap](https://dccsverify.com/sitemap.xml)" >> $GITHUB_STEP_SUMMARY
-          echo "- 📊 [Deployment Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Automation Status" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Code pushed to GitHub" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Build completed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Deployed to Netlify" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Bolt Database notified" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ All systems synchronized" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**⚡ Total deployment time: ~3 minutes**" >> $GITHUB_STEP_SUMMARY
+          echo "Notifying Google of updated content..."
+          # Ping Google sitemap to trigger re-crawl
+          curl -s "https://www.google.com/ping?sitemap=https://dccsverify.com/sitemap.xml" || true
+          echo "Sitemap pinged for re-indexing"
 
-      - name: Notify on failure
-        if: failure()
+      - name: Write job summary
+        if: always()
         run: |
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "## Deploy: ${{ needs.deploy.result == 'success' && 'SUCCESS' || 'FAILED' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Error Details" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Author**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Failed At**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Troubleshooting Steps" >> $GITHUB_STEP_SUMMARY
-          echo "1. Check the logs above for specific error messages" >> $GITHUB_STEP_SUMMARY
-          echo "2. Verify all GitHub secrets are correctly configured" >> $GITHUB_STEP_SUMMARY
-          echo "3. Run \`npm run build\` locally to test the build" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Site | [${{ env.PRODUCTION_URL }}](${{ env.PRODUCTION_URL }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Author | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployed | $(date -u +"%Y-%m-%d %H:%M UTC") |" >> $GITHUB_STEP_SUMMARY
+          echo "| Google Notified | Yes (sitemap pinged) |" >> $GITHUB_STEP_SUMMARY

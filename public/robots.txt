@@ -1,44 +1,58 @@
-# robots.txt for DCCS Platform
-# Last Updated: March 20, 2026
+# robots.txt for DCCS Platform (dccsverify.com)
+# Digital Creative Copyright System by Victor360 Brand Limited
 
+# Allow all search engines to index the platform
 User-agent: *
 Allow: /
 
-# Allow public pages
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Core public pages
+Allow: /
+Allow: /marketplace
 Allow: /upload
-Allow: /downloads
 Allow: /register
 Allow: /login
-Allow: /demo
+Allow: /search
+Allow: /verify
 Allow: /story
 Allow: /careers
 Allow: /safety
+Allow: /guidelines
 
-# Allow DCCS system pages
+# DCCS system pages
 Allow: /dccs-system
 Allow: /dccs-registration
 Allow: /dccs-verification
-Allow: /verify
-Allow: /verify-code
 
-# Allow artist profiles
+# Artist profiles for discovery
 Allow: /artist/*
 
-# Allow legal pages
+# Legal pages
 Allow: /legal/*
 
-# Disallow private areas
-Disallow: /my-content
+# Disallow private authenticated areas
+Disallow: /dashboard
 Disallow: /library
+Disallow: /downloads
 Disallow: /dccs-admin
 
-# Disallow authentication callbacks and internal routes
+# Disallow auth callbacks and password flows
 Disallow: /sso/callback
 Disallow: /reset-password
 Disallow: /forgot-password
 
-# Sitemap
+# Sitemap location
 Sitemap: https://dccsverify.com/sitemap.xml
 
-# Crawl delay
 Crawl-delay: 1

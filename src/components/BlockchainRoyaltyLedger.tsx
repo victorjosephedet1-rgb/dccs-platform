@@ -268,7 +268,6 @@ export default function BlockchainRoyaltyLedger({ artistId }: BlockchainRoyaltyL
             </button>
             <button 
               onClick={() => {
-                console.log('Exporting blockchain transaction history for artist:', artistId);
                 addNotification({
                   type: 'success',
                   title: 'Blockchain Data Exported',
@@ -331,7 +330,6 @@ export default function BlockchainRoyaltyLedger({ artistId }: BlockchainRoyaltyL
                   <td className="py-4 px-6">
                     <button
                       onClick={() => {
-                        console.log('Viewing transaction details:', tx);
                         addNotification({
                           type: 'info',
                           title: 'Transaction Details',

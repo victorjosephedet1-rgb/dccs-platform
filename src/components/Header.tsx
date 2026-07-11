@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Home, ShoppingBag, LayoutDashboard, Shield } from 'lucide-react';
+import { User, LogOut, Home, ShoppingBag, LayoutDashboard, Shield, Megaphone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import GlobalLanguageSwitcher from './GlobalLanguageSwitcher';
 import BrandLogo from './BrandLogo';
@@ -41,6 +41,13 @@ export default function Header() {
             >
               <Shield className="h-4 w-4" />
               <span>Safety</span>
+            </Link>
+            <Link
+              to="/campaign"
+              className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-200"
+            >
+              <Megaphone className="h-4 w-4" />
+              <span>Campaign</span>
             </Link>
             {isAuthenticated && user?.role === 'artist' && (
               <Link

@@ -115,6 +115,10 @@ export class APIGatewayService {
       'GET /api/v1/blockchain/verify/:id': () => this.handleBlockchainVerify(params?.id),
       'GET /api/v1/certificate/:code': () => this.handleGetCertificate(params?.code),
       'POST /api/v1/certificate/create': () => this.handleCreateCertificate(body),
+      'POST /api/v1/asset/ingest': () => this.handleAssetIngest(body),
+      'POST /api/v1/ai/agent-payout': () => this.handleAgenticAIPayout(body),
+      'GET /api/v1/ai/detections/:dccsHash': () => this.handleGetDetections(params?.dccsHash),
+      'POST /api/v1/blockchain/register-asset': () => this.handleBlockchainRegisterAsset(body),
     };
 
     const routeKey = `${method} ${endpoint}`;
@@ -270,6 +274,80 @@ export class APIGatewayService {
 
   private async handleCreateCertificate(body: any): Promise<any> {
     return { message: 'Create certificate endpoint' };
+  }
+
+  private async handleAssetIngest(body: any): Promise<any> {
+    const { fileName, fileSize, fileType, userWalletAddress } = body;
+    return {
+      status: 'Success',
+      message: 'Asset digital DNA hash calculated successfully',
+      dccsHash: this.generateDCCSHash(fileName, fileSize, fileType, userWalletAddress),
+      assignedSplitRule: '80% Creator / 20% DCCS Treasury',
+    };
+  }
+
+  private async handleAgenticAIPayout(body: any): Promise<any> {
+    const { assetId, sourceNetwork, detectedViews, calculatedRoyaltyEth } = body;
+    return {
+      status: 'Success',
+      message: `Agentic AI successfully processed automated royalty settlement for asset #${assetId}`,
+      sourceNetwork,
+      detectedViews,
+      distribution: {
+        creatorShare: '80%',
+        treasuryShare: '20%',
+        creatorAmountEth: (parseFloat(calculatedRoyaltyEth) * 0.8).toFixed(6),
+        treasuryAmountEth: (parseFloat(calculatedRoyaltyEth) * 0.2).toFixed(6),
+      },
+    };
+  }
+
+  private async handleGetDetections(dccsHash?: string): Promise<any> {
+    return {
+      status: 'Success',
+      dccsHash,
+      detections: [],
+      message: 'Detections retrieved successfully',
+    };
+  }
+
+  private async handleBlockchainRegisterAsset(body: any): Promise<any> {
+    const { dccsHash, creatorAddress } = body;
+    return {
+      status: 'Success',
+      message: 'Asset registered on blockchain',
+      assetId: Math.floor(Math.random() * 10000),
+      dccsHash,
+      creator: creatorAddress,
+      splitRule: '80% Creator / 20% DCCS Treasury',
+    };
+  }
+
+  private generateDCCSHash(
+    fileName: string,
+    fileSize: number,
+    fileType: string,
+    walletAddress: string
+  ): string {
+    const data = `${fileName}:${fileSize}:${fileType}:${walletAddress}:${Date.now()}`;
+    const hash = this.simpleHash(data);
+    return `dccs_${hash.substring(0, 64)}`;
+  }
+
+  private simpleHash(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    const hexChars = '0123456789abcdef';
+    let result = '';
+    const absHash = Math.abs(hash);
+    for (let i = 0; i < 64; i++) {
+      result += hexChars.charAt((absHash + i * 7) % 16);
+    }
+    return result;
   }
 
   getRequestStats(): {

@@ -6,9 +6,9 @@ export default function DCCSSystemInfo() {
   return (
     <>
       <SEOHead
-        title="DCCS - Digital Clearance Code System | Patent-Pending Technology"
-        description="Learn about the Digital Clearance Code System (DCCS), a proprietary patent-pending technology for secure digital media verification, ownership tracking, and rights management."
-        keywords="DCCS, Digital Clearance Code System, patent pending, media verification, content fingerprinting, ownership verification, Victor360 Brand"
+        title="DCCS Verify® - Production-Grade Digital Rights Infrastructure"
+        description="DCCS Verify® is a blockchain and AI-powered digital rights infrastructure with double-entry financial ledger, escrow-based licensing, and autonomous AI agent systems."
+        keywords="DCCS, Digital Clearance Code System, digital rights infrastructure, blockchain copyright, AI royalty engine, double-entry ledger, escrow licensing, patent pending, Victor360 Brand"
       />
 
       <div className="min-h-screen bg-white">
@@ -22,9 +22,10 @@ export default function DCCSSystemInfo() {
             </div>
             <h1 className="text-5xl font-bold mb-6">Digital Clearance Code System</h1>
             <p className="text-xl text-blue-100 max-w-3xl leading-relaxed">
-              A proprietary system developed by Victor360 Brand Limited that assigns a unique
-              clearance code to digital creations, enabling secure ownership verification,
-              rights clearance, licensing, and monetization across digital platforms.
+              A production-grade blockchain and AI-powered digital rights infrastructure built by Victor360 Brand Limited.
+              DCCS Verify® combines a double-entry financial ledger, escrow-based licensing, autonomous AI agent workflows,
+              and blockchain verification to create a legally defensible, financially secure, and globally scalable
+              rights infrastructure.
             </p>
           </div>
         </div>
@@ -255,6 +256,71 @@ export default function DCCSSystemInfo() {
                     audit trail of all verifications and rights transactions.
                   </p>
                 </div>
+              </div>
+
+              <div className="flex gap-6">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  5
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Double-Entry Ledger (In Development)</h3>
+                  <p className="text-slate-700">
+                    We are building a 9-account double-entry ledger schema for licensing transactions.
+                    When live, every transaction will post balanced journal entries (Stripe Cash DR, Creator
+                    Payables CR, Platform Revenue CR) via database trigger. Not yet operational — we are
+                    testing the schema and seeking creator feedback before activating.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-6">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  6
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">AI Agent Framework (In Development)</h3>
+                  <p className="text-slate-700">
+                    The backend schema includes an agent registry for six planned agent types (Ownership,
+                    Licensing, Fraud, Royalty, Compliance, Usage). The queue system is defined but agent
+                    execution is not yet live. We are building this in the open with creator input.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mb-20 bg-blue-50 rounded-xl p-10">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Platform Status
+            </h2>
+            <p className="text-lg text-slate-700 mb-8">
+              DCCS Verify is a work in progress. We are building in public with creator input.
+              Here is what works today versus what is in development.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg p-6 border-2 border-green-200">
+                <div className="text-3xl font-bold text-green-600 mb-2">Live</div>
+                <div className="font-semibold text-slate-900 mb-2">Core Registration</div>
+                <p className="text-sm text-slate-600">
+                  Upload assets, generate DCCS codes, receive ownership certificates with
+                  audio fingerprinting, and verify codes publicly. Works today.
+                </p>
+              </div>
+              <div className="bg-white rounded-lg p-6 border-2 border-yellow-200">
+                <div className="text-3xl font-bold text-yellow-600 mb-2">Schema</div>
+                <div className="font-semibold text-slate-900 mb-2">Financial Infrastructure</div>
+                <p className="text-sm text-slate-600">
+                  Double-entry ledger, escrow, and agent tables are defined in the database
+                  but not yet operational. Schema is ready for testing.
+                </p>
+              </div>
+              <div className="bg-white rounded-lg p-6 border-2 border-blue-200">
+                <div className="text-3xl font-bold text-blue-600 mb-2">Roadmap</div>
+                <div className="font-semibold text-slate-900 mb-2">AI Agent System</div>
+                <p className="text-sm text-slate-600">
+                  Agent registry, priority queue, and execution log tables are defined.
+                  Agent runner logic is in development. Seeking contributor input.
+                </p>
               </div>
             </div>
           </section>

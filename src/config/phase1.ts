@@ -51,18 +51,22 @@ export const PHASE_1_CONFIG = {
     LICENSING: false,
     MARKETPLACE: false,
 
-    // DISABLED: DCCS advanced tracking
-    DCCS_REGISTRATION: false,
-    DCCS_CERTIFICATES: false,
-    DCCS_VERIFICATION: false,
+    // ENABLED: DCCS Phase 1 core pipeline
+    DCCS_REGISTRATION: true,
+    DCCS_CERTIFICATES: true,
+    DCCS_VERIFICATION: true,
+    DCCS_CLEARANCE_CODES: true,
+
+    // DISABLED: DCCS Phase 2+ tracking
     DCCS_ROYALTY_TRACKING: false,
-    DCCS_CLEARANCE_CODES: false,
     DCCS_DISPUTES: false,
 
-    // DISABLED: AI & Content Recognition
+    // ENABLED: Cryptographic fingerprinting (SHA-256, no AI)
+    AUDIO_FINGERPRINTING: true,
+
+    // DISABLED: AI & Content Recognition (Phase 2+)
     AI_CONTENT_DETECTION: false,
     AI_MODERATION: false,
-    AUDIO_FINGERPRINTING: false,
     COPYRIGHT_DETECTION: false,
     AI_TRAINING_CONSENT: false,
 
@@ -116,7 +120,7 @@ export const PHASE_1_CONFIG = {
   UI: {
     SHOW_PHASE_2_COMING_SOON: false,
     SHOW_MONETIZATION_MESSAGES: false,
-    SHOW_DCCS_BRANDING: false,
+    SHOW_DCCS_BRANDING: true,
     SHOW_PAYMENT_OPTIONS: false,
     SHOW_LICENSING_INFO: false,
     SIMPLIFIED_NAVIGATION: true,
@@ -128,9 +132,9 @@ export const PHASE_1_CONFIG = {
    */
   UPLOAD: {
     REQUIRE_PAYMENT: false,
-    GENERATE_DCCS_CODE: false,
+    GENERATE_DCCS_CODE: true,
     RUN_AI_DETECTION: false,
-    RUN_FINGERPRINTING: false,
+    RUN_FINGERPRINTING: true,
     CHECK_COPYRIGHT: false,
     IMMEDIATE_AVAILABILITY: true,
     FREE_UNLIMITED_UPLOADS: true,
@@ -142,7 +146,7 @@ export const PHASE_1_CONFIG = {
   DOWNLOAD: {
     REQUIRE_PAYMENT: false,
     REQUIRE_LICENSE: false,
-    SHOW_DCCS_CODES: false,
+    SHOW_DCCS_CODES: true,
     TRACK_USAGE: false,
     GENERATE_ROYALTIES: false,
     FREE_UNLIMITED_DOWNLOADS: true,

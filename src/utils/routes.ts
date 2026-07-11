@@ -42,6 +42,7 @@ export const ROUTES = {
   SAFETY: '/safety',
   GUIDELINES: '/guidelines',
   CATALOG: '/catalog',
+  CAMPAIGN: '/campaign',
 
   SSO_CALLBACK: '/sso/callback',
 

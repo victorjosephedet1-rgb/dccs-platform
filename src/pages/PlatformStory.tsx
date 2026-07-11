@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import {
   Upload,
-  Music,
-  Sparkles,
+  Shield,
   Users,
   Download,
-  Shield,
   PlayCircle,
   CheckCircle,
   Heart,
-  Share2,
-  Zap,
-  Globe,
-  ChevronRight,
   ArrowRight,
   Star,
-  Mic,
-  Headphones,
-  Radio
+  Megaphone,
+  Bug,
+  Lightbulb,
+  Globe,
+  MessageSquare,
+  Mail,
+  Link
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 interface StoryScene {
   id: number;
@@ -37,88 +35,71 @@ interface StoryScene {
 const scenes: StoryScene[] = [
   {
     id: 1,
-    title: 'Welcome & Onboarding',
-    subtitle: 'Your Creative Journey Begins',
-    description: 'The AI assistant warmly welcomes a diverse global family to the platform, explaining how easy it is to create, protect, and share music together.',
-    icon: Heart,
+    title: 'Upload & Register',
+    subtitle: 'Secure Your Creative Work',
+    description: 'You upload an audio file, image, video, or document. The system generates a unique DCCS code and creates an ownership certificate. The file is fingerprinted for future verification.',
+    icon: Upload,
     color: 'blue',
     gradient: 'from-blue-500 via-cyan-500 to-teal-500',
     features: [
-      'Friendly AI guide with culturally inclusive design',
-      'Multi-language support for global families',
-      'Interactive tutorial with real-time help',
-      'Personalized dashboard setup'
+      'Drag-and-drop upload for audio, images, video, documents',
+      'Instant DCCS code generation',
+      'Audio fingerprinting for verification matching',
+      'Ownership certificate with timestamp and creator details'
     ],
-    characters: ['Grandmother from UK', 'Teenager from USA', 'Father from Brazil', 'Mother from Japan'],
-    aiMessage: 'Welcome to Digital Creative Copyright System (DCCS)! I\'m here to help you create, protect, and verify ownership of your creative work. Let\'s start your journey!'
+    characters: ['Musician uploads a track', 'Designer uploads artwork', 'Filmmaker uploads footage', 'Writer uploads manuscript'],
+    aiMessage: 'Welcome! Your upload is being processed. I will generate a unique DCCS code and fingerprint for your work. This is the first step in establishing verified ownership.'
   },
   {
     id: 2,
-    title: 'Music Upload & DCCS Protection',
-    subtitle: 'Secure Your Creative Rights',
-    description: 'Family members upload their original tracks. The AI instantly generates unique DCCS codes, creating a blockchain-verified certificate of ownership for each creation.',
+    title: 'Verification & Protection',
+    subtitle: 'Prove You Created It',
+    description: 'Your DCCS certificate is stored in the database with a public verification link. Anyone can enter your DCCS code to verify ownership, date, and creator details.',
     icon: Shield,
     color: 'purple',
     gradient: 'from-purple-500 via-pink-500 to-rose-500',
     features: [
-      'Drag-and-drop file upload',
-      'Instant DCCS code generation',
-      'Blockchain certification in seconds',
-      'Audio fingerprinting & metadata extraction'
+      'Public verification portal at /verify',
+      'DCCS code lookup shows ownership, date, file hash',
+      'Blockchain-ready certificate structure',
+      'Immutable audit trail of all verifications'
     ],
-    characters: ['Teen uploads first beat', 'Dad uploads guitar recording', 'Mom uploads vocal track', 'Grandma uploads traditional song'],
-    aiMessage: 'Perfect! Your music is now protected with DCCS blockchain certification. Your unique code: DCCS-2026-AFR-X7K9M. This proves you created it!'
+    characters: ['Creator shares DCCS code', 'Buyer verifies ownership', 'Platform checks clearance', 'Lawyer reviews audit log'],
+    aiMessage: 'Your DCCS certificate is ready. Share your code: DCCS-2026-AFR-X7K9M. Anyone can verify it publicly. The certificate includes your name, timestamp, and file fingerprint.'
   },
   {
     id: 3,
-    title: 'AI Music Generation & Remixing',
-    subtitle: 'Create Magic Together',
-    description: 'The AI helps the family create new tracks and remix existing ones. Real-time collaboration with style suggestions, live previews, and creative recommendations.',
-    icon: Sparkles,
-    color: 'amber',
-    gradient: 'from-amber-500 via-orange-500 to-red-500',
-    features: [
-      'AI-powered music generation',
-      'Interactive remix controls',
-      'Style transfer & genre fusion',
-      'Live preview with waveform visualization'
-    ],
-    characters: ['Teen blends genres together', 'Family creates collaborative track', 'Dad remixes grandma\'s traditional song', 'AI suggests harmonies'],
-    aiMessage: 'Love that fusion! Try adding a rhythmic element to your electronic base. I can help blend your family\'s musical styles into something unique!'
-  },
-  {
-    id: 4,
-    title: 'Library & Collaboration',
-    subtitle: 'Share & Grow Together',
-    description: 'The family explores their growing music library, shares tracks with friends worldwide, and collaborates with other creators in real-time.',
+    title: 'Creator Community',
+    subtitle: 'Build, Test, and Improve Together',
+    description: 'Creators worldwide upload their work, test the verification system, and report issues. Every complaint drives a bug fix or feature improvement. The platform evolves through real creator feedback.',
     icon: Users,
     color: 'green',
     gradient: 'from-green-500 via-emerald-500 to-teal-500',
     features: [
-      'Organized music library with smart folders',
-      'Real-time collaboration tools',
-      'Share tracks privately or publicly',
-      'AI feedback & creative suggestions'
+      'Creator dashboard with upload history',
+      'Community feedback loop via reports and complaints',
+      'Issue tracking drives development priority',
+      'Beta tester recognition for early adopters'
     ],
-    characters: ['Family reviews their 15 tracks', 'Sharing with relatives abroad', 'Collaborating with creators worldwide', 'AI organizes by mood & style'],
-    aiMessage: 'Your library is growing beautifully! I\'ve organized your tracks by mood and style. Want to collaborate with other creators who match your vibe?'
+    characters: ['Musician tests audio fingerprint', 'Designer reports UI bug', 'Developer fixes issue in hours', 'Community votes on next feature'],
+    aiMessage: 'We are building this together. Your feedback matters. Report a bug, suggest a feature, or tell us what is missing. We read every message and ship improvements fast.'
   },
   {
-    id: 5,
-    title: 'Download & Ownership Celebration',
-    subtitle: 'Your Music, Your Rights',
-    description: 'The family downloads their finished masterpieces with full DCCS verification. The AI celebrates their creative achievement and explains their ownership rights.',
+    id: 4,
+    title: 'Download & Certificate',
+    subtitle: 'Your Proof, Your Rights',
+    description: 'You download your certificate with the DCCS code embedded. The certificate serves as evidence of ownership and creation date. Use it in licensing deals, disputes, or portfolio submissions.',
     icon: Download,
     color: 'indigo',
     gradient: 'from-indigo-500 via-purple-500 to-pink-500',
     features: [
-      'High-quality downloads (WAV, FLAC, MP3)',
-      'DCCS certificate included with every download',
-      'Blockchain-verified ownership proof',
-      'Re-download anytime with DCCS code'
+      'Downloadable PDF certificate with DCCS code',
+      'Blockchain-ready metadata structure',
+      'Re-verify anytime using your DCCS code',
+      'Certificate includes file hash for integrity proof'
     ],
-    characters: ['Downloading family album', 'Sharing DCCS certificates', 'Verifying ownership codes', 'Celebrating together'],
-    aiMessage: 'Congratulations! Your family album is complete and fully protected. You own 100% of your rights with blockchain-verified DCCS certificates. Share your verified ownership with the world!'
+    characters: ['Downloading certificate', 'Sharing proof with client', 'Using in licensing deal', 'Verifying on public portal'],
+    aiMessage: 'Your certificate is ready for download. It includes your DCCS code, creation timestamp, file fingerprint, and creator details. This is your proof of ownership. Use it anywhere.'
   }
 ];
 
@@ -141,9 +122,27 @@ export default function PlatformStory() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Campaign Banner */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-center gap-3 text-white">
+            <Megaphone className="h-5 w-5" />
+            <span className="font-semibold">Global Creator Callout:</span>
+            <span className="text-white/90">
+              We need indie creators worldwide to test DCCS Verify and tell us what breaks.
+            </span>
+            <RouterLink
+              to="/campaign"
+              className="ml-2 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-semibold transition-all"
+            >
+              Join the Campaign
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20" />
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse" />
@@ -153,19 +152,20 @@ export default function PlatformStory() {
         <div className="relative container mx-auto px-6 py-20">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
-              <Sparkles className="h-4 w-4 text-blue-400" />
-              <span className="text-sm text-blue-400">Interactive Platform Story</span>
+              <Heart className="h-4 w-4 text-blue-400" />
+              <span className="text-sm text-blue-400">How DCCS Verify Works</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              How V3B Music
+              DCCS Verify
               <span className={`block bg-gradient-to-r ${currentScene.gradient} bg-clip-text text-transparent`}>
-                Empowers Families
+                In Action
               </span>
             </h1>
 
             <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-              Follow a global family's journey as they create, protect, and share music together with the help of our intelligent AI assistant
+              See what DCCS Verify actually does today — upload, verify, and protect your creative work.
+              No hype. No fiction. Just what works.
             </p>
           </div>
 
@@ -257,7 +257,6 @@ export default function PlatformStory() {
               </div>
             </div>
 
-            {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl" />
           </div>
@@ -265,20 +264,17 @@ export default function PlatformStory() {
           {/* Scene Content */}
           <div className="p-8 md:p-12">
             <div className="grid md:grid-cols-2 gap-12 mb-12">
-              {/* Left: Illustration Placeholder */}
+              {/* Left: Illustration */}
               <div className="space-y-6">
                 <div className={`relative aspect-square rounded-2xl bg-gradient-to-br ${currentScene.gradient} p-1`}>
                   <div className="w-full h-full bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden">
-                    {/* Animated Scene Illustration */}
                     <div className="relative w-full h-full p-8">
-                      {/* AI Assistant Character */}
                       <div className="absolute top-8 right-8 animate-bounce">
                         <div className={`p-4 bg-gradient-to-br ${currentScene.gradient} rounded-full border-4 border-white/20`}>
-                          <Sparkles className="h-8 w-8 text-white" />
+                          <Shield className="h-8 w-8 text-white" />
                         </div>
                       </div>
 
-                      {/* Family Characters */}
                       <div className="absolute bottom-8 left-8 right-8">
                         <div className="grid grid-cols-4 gap-4">
                           {currentScene.characters.map((character, idx) => (
@@ -295,16 +291,14 @@ export default function PlatformStory() {
                         </div>
                       </div>
 
-                      {/* Platform UI Elements */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Icon className="h-32 w-32 text-white/10" />
                       </div>
 
-                      {/* Floating Elements */}
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                         <div className="relative">
                           <div className="absolute inset-0 bg-white/5 rounded-full blur-xl animate-pulse" />
-                          <Music className="relative h-12 w-12 text-white/40 animate-spin-slow" />
+                          <Shield className="relative h-12 w-12 text-white/40 animate-spin-slow" />
                         </div>
                       </div>
                     </div>
@@ -315,7 +309,7 @@ export default function PlatformStory() {
                 <div className="bg-white/5 rounded-xl p-6 border border-white/10">
                   <div className="flex items-center gap-2 mb-4">
                     <Users className="h-5 w-5 text-blue-400" />
-                    <h3 className="font-semibold text-white">Meet the Family</h3>
+                    <h3 className="font-semibold text-white">Creator Examples</h3>
                   </div>
                   <div className="space-y-2">
                     {currentScene.characters.map((character, idx) => (
@@ -333,7 +327,7 @@ export default function PlatformStory() {
                 {/* Description */}
                 <div>
                   <h3 className="text-2xl font-bold text-white mb-4">
-                    What's Happening
+                    What Happens
                   </h3>
                   <p className="text-lg text-slate-300 leading-relaxed">
                     {currentScene.description}
@@ -345,11 +339,11 @@ export default function PlatformStory() {
                   <div className="bg-slate-800 rounded-2xl p-6">
                     <div className="flex items-start gap-3 mb-3">
                       <div className={`p-2 bg-gradient-to-br ${currentScene.gradient} rounded-lg`}>
-                        <Sparkles className="h-5 w-5 text-white" />
+                        <Shield className="h-5 w-5 text-white" />
                       </div>
                       <div>
                         <div className="text-sm font-medium text-slate-400 mb-1">
-                          V3B AI Assistant
+                          DCCS Assistant
                         </div>
                         <div className="text-white font-medium">
                           {currentScene.aiMessage}
@@ -362,8 +356,8 @@ export default function PlatformStory() {
                 {/* Features */}
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-yellow-400" />
-                    Platform Features in Action
+                    <Lightbulb className="h-5 w-5 text-yellow-400" />
+                    Features Working Today
                   </h3>
                   <div className="space-y-3">
                     {currentScene.features.map((feature, idx) => (
@@ -389,7 +383,7 @@ export default function PlatformStory() {
                 disabled={activeScene === 0}
                 className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                <ChevronRight className="h-5 w-5 rotate-180" />
+                <ArrowRight className="h-5 w-5 rotate-180" />
                 <span>Previous Scene</span>
               </button>
 
@@ -425,99 +419,183 @@ export default function PlatformStory() {
         </div>
       </div>
 
-      {/* Call to Action */}
+      {/* Campaign Callout Section */}
       <div className="container mx-auto px-6 py-20">
         <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-1">
-          <div className="bg-slate-900 rounded-3xl p-12 text-center">
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
-              <Star className="h-4 w-4 text-blue-400" />
-              <span className="text-sm text-blue-400">Start Your Journey Today</span>
+          <div className="bg-slate-900 rounded-3xl p-12">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
+                <Megaphone className="h-4 w-4 text-blue-400" />
+                <span className="text-sm text-blue-400">Global Creator Callout</span>
+              </div>
+
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Indie Creators Worldwide:
+                <span className="block text-blue-400">Test DCCS Verify</span>
+              </h2>
+
+              <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto">
+                We are building DCCS Verify in the open. We need musicians, designers, filmmakers, writers,
+                and digital creators from every country to upload their work, test the system, and tell us
+                what breaks. Every complaint drives innovation. Every bug report makes the platform stronger.
+              </p>
             </div>
 
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to Create Your Family's Music Story?
-            </h2>
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-white/5 rounded-xl p-8 border border-white/10 text-center">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl w-fit mx-auto mb-4">
+                  <Bug className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Report Bugs</h3>
+                <p className="text-slate-300">
+                  Upload fails? Verification wrong? Certificate broken? Tell us immediately. We fix issues fast.
+                </p>
+              </div>
 
-            <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of families worldwide creating, protecting, and sharing music together on V3B Music
-            </p>
+              <div className="bg-white/5 rounded-xl p-8 border border-white/10 text-center">
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl w-fit mx-auto mb-4">
+                  <Lightbulb className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Suggest Features</h3>
+                <p className="text-slate-300">
+                  What do you need that we do not have? Licensing workflows? Better fingerprints? More file types?
+                </p>
+              </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
+              <div className="bg-white/5 rounded-xl p-8 border border-white/10 text-center">
+                <div className="p-3 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl w-fit mx-auto mb-4">
+                  <Globe className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Spread the Word</h3>
+                <p className="text-slate-300">
+                  Share DCCS Verify with your creator network. More testers = more feedback = better platform.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+              <RouterLink
                 to="/register"
                 className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl text-white font-semibold transition-all shadow-xl shadow-blue-500/20"
               >
-                <span>Get Started Free</span>
-                <ArrowRight className="h-5 w-5" />
-              </Link>
+                <Upload className="h-5 w-5" />
+                <span>Upload & Test Now</span>
+              </RouterLink>
 
-              <Link
-                to="/demo"
+              <RouterLink
+                to="/campaign"
                 className="flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 rounded-xl text-white font-semibold border border-white/20 transition-all"
               >
-                <PlayCircle className="h-5 w-5" />
-                <span>Try the Demo</span>
-              </Link>
-
-              <Link
-                to="/marketplace"
-                className="flex items-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 rounded-xl text-white font-semibold border border-white/10 transition-all"
-              >
-                <Globe className="h-5 w-5" />
-                <span>Explore Music</span>
-              </Link>
+                <Megaphone className="h-5 w-5" />
+                <span>Read the Full Campaign</span>
+              </RouterLink>
             </div>
 
-            {/* Stats */}
-            <div className="grid md:grid-cols-3 gap-8 mt-12 pt-12 border-t border-white/10">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-white mb-2">195+</div>
-                <div className="text-slate-400">Countries Served</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-white mb-2">80%</div>
-                <div className="text-slate-400">Royalty to Creators</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-white mb-2">100%</div>
-                <div className="text-slate-400">Rights Protection</div>
+            {/* Feedback Channels */}
+            <div className="bg-white/5 rounded-xl p-8 border border-white/10">
+              <h3 className="text-xl font-bold text-white mb-6 text-center flex items-center justify-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-400" />
+                How to Send Feedback
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="flex items-start gap-3">
+                  <Mail className="h-5 w-5 text-blue-400 flex-shrink-0 mt-1" />
+                  <div>
+                    <div className="text-white font-medium">Email</div>
+                    <div className="text-slate-400 text-sm">support@dccsverify.com</div>
+                    <div className="text-slate-500 text-xs">For bugs, complaints, and suggestions</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Link className="h-5 w-5 text-blue-400 flex-shrink-0 mt-1" />
+                  <div>
+                    <div className="text-white font-medium">GitHub</div>
+                    <div className="text-slate-400 text-sm">github.com/victorjosephedet1-rgb/dccsverify-platform1new</div>
+                    <div className="text-slate-500 text-xs">Open issues, pull requests, feature requests</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Globe className="h-5 w-5 text-blue-400 flex-shrink-0 mt-1" />
+                  <div>
+                    <div className="text-white font-medium">Social</div>
+                    <div className="text-slate-400 text-sm">@dccsverify on social platforms</div>
+                    <div className="text-slate-500 text-xs">Public feedback and community discussion</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Additional Info */}
+      {/* Honest Footer Info */}
       <div className="container mx-auto px-6 pb-20">
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-all group">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
-              <Shield className="h-6 w-6 text-white" />
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 text-center">
+          <h3 className="text-xl font-bold text-white mb-4">What We Actually Do Today</h3>
+          <div className="grid md:grid-cols-3 gap-6 text-left">
+            <div>
+              <div className="font-semibold text-green-400 mb-2">Working Now</div>
+              <ul className="space-y-2 text-sm text-slate-300">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
+                  Upload and register creative assets
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
+                  Generate DCCS codes and certificates
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
+                  Audio fingerprinting for verification
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
+                  Public verification portal
+                </li>
+              </ul>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">DCCS Protection</h3>
-            <p className="text-slate-300">
-              Every upload gets blockchain-verified certification, proving ownership instantly and permanently.
-            </p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-all group">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
-              <Sparkles className="h-6 w-6 text-white" />
+            <div>
+              <div className="font-semibold text-yellow-400 mb-2">In Development</div>
+              <ul className="space-y-2 text-sm text-slate-300">
+                <li className="flex items-center gap-2">
+                  <Bug className="h-4 w-4 text-yellow-400" />
+                  Double-entry ledger system
+                </li>
+                <li className="flex items-center gap-2">
+                  <Bug className="h-4 w-4 text-yellow-400" />
+                  Escrow-based licensing
+                </li>
+                <li className="flex items-center gap-2">
+                  <Bug className="h-4 w-4 text-yellow-400" />
+                  AI agent orchestration
+                </li>
+                <li className="flex items-center gap-2">
+                  <Bug className="h-4 w-4 text-yellow-400" />
+                  Marketplace and royalties
+                </li>
+              </ul>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">AI-Powered Creation</h3>
-            <p className="text-slate-300">
-              Our intelligent AI assistant guides you through every step with personalized recommendations.
-            </p>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-all group">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
-              <Globe className="h-6 w-6 text-white" />
+            <div>
+              <div className="font-semibold text-blue-400 mb-2">We Need Your Help</div>
+              <ul className="space-y-2 text-sm text-slate-300">
+                <li className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-blue-400" />
+                  Test uploads with your file types
+                </li>
+                <li className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-blue-400" />
+                  Report verification failures
+                </li>
+                <li className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-blue-400" />
+                  Tell us what features you need
+                </li>
+                <li className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-blue-400" />
+                  Share with your creator network
+                </li>
+              </ul>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">Global Family</h3>
-            <p className="text-slate-300">
-              Connect and collaborate with creators worldwide, sharing culture and creativity across borders.
-            </p>
           </div>
         </div>
       </div>

@@ -12,20 +12,7 @@ const isSupabaseConfigured = Boolean(
 )
 
 if (!isSupabaseConfigured) {
-  console.error('[CONFIGURATION ERROR] Supabase is not configured properly!');
-  console.error('Missing or invalid environment variables:');
-  console.error('  VITE_SUPABASE_URL:', supabaseUrl ? 'Set but invalid format' : 'NOT SET');
-  console.error('  VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Set but invalid format' : 'NOT SET');
-  console.error('');
-  console.error('Required format:');
-  console.error('  VITE_SUPABASE_URL must start with https:// and contain .supabase.co');
-  console.error('  VITE_SUPABASE_ANON_KEY must start with eyJ (JWT format)');
-  console.error('');
-  console.error('Platform will run in demo mode with limited functionality.');
-} else {
-  console.log('[CONFIGURATION] Supabase configured successfully');
-  console.log('  URL:', supabaseUrl);
-  console.log('  Key:', supabaseAnonKey.substring(0, 20) + '...');
+  console.error('[DCCS] Supabase is not configured. Platform running in demo mode.');
 }
 
 export const supabase = isSupabaseConfigured

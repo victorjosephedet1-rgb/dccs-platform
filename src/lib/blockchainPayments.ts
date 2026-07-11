@@ -117,8 +117,6 @@ export class BlockchainPaymentProcessor {
       // Step 5: Record in database
       await this.recordBlockchainPayment(transaction, metadata);
 
-      console.log(`✅ Payment completed in ${transaction.timestamp}`);
-      console.log(`📍 Transaction hash: ${transaction.hash}`);
 
       return transaction;
 
@@ -243,7 +241,7 @@ export class BlockchainPaymentProcessor {
       .eq('network', network)
       .eq('type', type)
       .eq('verified', true)
-      .single();
+      .maybeSingle();
 
     if (existingContract) {
       return existingContract as SmartContract;
@@ -578,7 +576,6 @@ export class InstantPayoutSystem {
     blockchain_hash?: string;
   }> {
     try {
-      console.log(`💸 Processing instant payout: $${amount} to artist ${artistId}`);
 
       // Get artist wallet/bank info
       const { data: profile } = await supabase

@@ -243,7 +243,7 @@ export default function MyContent() {
       {showSubmissionForm && (
         <ProjectSubmissionForm
           onClose={() => setShowSubmissionForm(false)}
-          onSuccess={() => {
+          onSuccess={(_projectId) => {
             setShowSubmissionForm(false);
             loadContent();
           }}

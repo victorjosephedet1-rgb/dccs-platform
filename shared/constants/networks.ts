@@ -7,6 +7,7 @@ export const SUPPORTED_NETWORKS: Record<number, NetworkConfig> = {
     rpcUrl: "http://127.0.0.1:8545",
     blockExplorer: "",
     contracts: {
+      DCCSRoyaltySplitter: "",
       RoyaltySplitter: "",
       DCCSRegistry: "",
       LicenseNFT: "",
@@ -19,6 +20,7 @@ export const SUPPORTED_NETWORKS: Record<number, NetworkConfig> = {
     rpcUrl: "https://sepolia.base.org",
     blockExplorer: "https://sepolia.basescan.org",
     contracts: {
+      DCCSRoyaltySplitter: "",
       RoyaltySplitter: "",
       DCCSRegistry: "",
       LicenseNFT: "",
@@ -31,6 +33,7 @@ export const SUPPORTED_NETWORKS: Record<number, NetworkConfig> = {
     rpcUrl: "https://mainnet.base.org",
     blockExplorer: "https://basescan.org",
     contracts: {
+      DCCSRoyaltySplitter: "",
       RoyaltySplitter: "",
       DCCSRegistry: "",
       LicenseNFT: "",

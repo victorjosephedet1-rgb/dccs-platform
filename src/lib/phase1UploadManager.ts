@@ -1,38 +1,56 @@
 /**
  * Phase 1 Upload Manager
  *
- * Simplified upload manager that wraps the full uploadManager
- * and disables all Phase 2+ features for Phase 1 compliance.
+ * Orchestrates Stage 1 (File Ingestion) of the DCCS Clearance Pipeline:
+ *   1. Validate file type and size
+ *   2. Create the uploads database record (status = uploading)
+ *   3. Upload bytes to Supabase Storage
+ *   4. Hand off to DCCSPipeline for Stages 2–5
+ *   5. Mark the uploads record as completed with public URL
  *
- * Phase 1 Features Only:
- * - Basic file upload
- * - Immediate availability
- * - No payment required
- * - No DCCS code generation
- * - No AI detection
- * - No fingerprinting
+ * The DCCSPipeline call is non-blocking for the upload — if it fails,
+ * the file is still available but has no DCCS code assigned.
  */
 
-import { supabase } from './supabase';
+import { supabase }                            from './supabase';
 import { validateFile, sanitizeFileName, getMediaDuration } from './fileValidator';
-import { PHASE_1_CONFIG } from '../config/phase1';
-import { errorHandler, ErrorCategory } from './ErrorHandler';
+import { PHASE_1_CONFIG }                      from '../config/phase1';
+import { errorHandler, ErrorCategory }         from './ErrorHandler';
+import { DCCSPipeline }                        from './services/DCCSPipeline';
+
+// ---------------------------------------------------------------------------
+// Canonical bucket router — single source of truth shared with Phase1Downloads
+// ---------------------------------------------------------------------------
+
+export function getBucketForCategory(category: string): string {
+  if (category === 'video' || category === 'image') return 'video-content';
+  return 'audio-files';
+}
+
+// ---------------------------------------------------------------------------
+// Public interfaces
+// ---------------------------------------------------------------------------
 
 export interface Phase1UploadProgress {
-  uploadId: string;
-  fileName: string;
-  progress: number;
-  status: 'pending' | 'uploading' | 'processing' | 'completed' | 'failed';
-  error?: string;
-  url?: string;
+  uploadId:         string;
+  fileName:         string;
+  progress:         number;
+  status:           'pending' | 'uploading' | 'processing' | 'completed' | 'failed';
+  error?:           string;
+  url?:             string;
+  dccsClearanceCode?: string;
 }
 
 export interface Phase1UploadOptions {
   onProgress?: (progress: Phase1UploadProgress) => void;
   description?: string;
-  maxRetries?: number;
-  retryDelay?: number;
+  maxRetries?:  number;
+  retryDelay?:  number;
 }
+
+// ---------------------------------------------------------------------------
+// Implementation
+// ---------------------------------------------------------------------------
 
 class Phase1UploadManager {
   private activeUploads: Map<string, AbortController> = new Map();
@@ -40,9 +58,9 @@ class Phase1UploadManager {
   private readonly DEFAULT_RETRY_DELAY = 2000;
 
   private async retryOperation<T>(
-    operation: () => Promise<T>,
-    maxRetries: number,
-    retryDelay: number,
+    operation:     () => Promise<T>,
+    maxRetries:    number,
+    retryDelay:    number,
     operationName: string
   ): Promise<T> {
     let lastError: Error | null = null;
@@ -50,80 +68,59 @@ class Phase1UploadManager {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         if (attempt > 0) {
-          console.log(`[UPLOAD RETRY] Retrying ${operationName}, attempt ${attempt}/${maxRetries}`);
           await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
         }
-
         return await operation();
-      } catch (error) {
-        lastError = error as Error;
-        console.warn(`[UPLOAD] ${operationName} failed, attempt ${attempt + 1}/${maxRetries + 1}:`, error);
+      } catch (err) {
+        lastError = err as Error;
 
-        if (attempt === maxRetries) {
-          break;
-        }
+        if (attempt === maxRetries) break;
 
-        const isRetryable = !error.message?.includes('Invalid') &&
-                           !error.message?.includes('validation') &&
-                           !error.message?.includes('permission denied');
-
-        if (!isRetryable) {
-          throw error;
-        }
+        // Do not retry validation or permission errors — they will never succeed.
+        const message = (err as Error).message ?? '';
+        const isRetryable = !message.includes('Invalid') &&
+                            !message.includes('validation') &&
+                            !message.includes('permission denied');
+        if (!isRetryable) throw err;
       }
     }
 
-    throw lastError || new Error(`${operationName} failed after ${maxRetries} retries`);
+    throw lastError ?? new Error(`${operationName} failed after ${maxRetries} retries`);
   }
 
   async uploadFile(
-    file: File,
+    file:    File,
     options: Phase1UploadOptions = {}
   ): Promise<Phase1UploadProgress> {
-    const uploadId = crypto.randomUUID();
+    const uploadId        = crypto.randomUUID();
     const abortController = new AbortController();
     this.activeUploads.set(uploadId, abortController);
-
-    console.log('[UPLOAD] Starting file upload:', {
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      uploadId
-    });
 
     const maxRetries = options.maxRetries ?? this.DEFAULT_MAX_RETRIES;
     const retryDelay = options.retryDelay ?? this.DEFAULT_RETRY_DELAY;
 
     try {
+      // ── Stage 1a: File validation ────────────────────────────────────────
       const validation = validateFile(file);
       if (!validation.valid) {
-        const validationError = errorHandler.handleError(
+        const handled = errorHandler.handleError(
           new Error(validation.error),
           ErrorCategory.VALIDATION,
           'File validation'
         );
-        console.error('[UPLOAD ERROR] File validation failed:', {
-          fileName: file.name,
-          error: validation.error
-        });
-        throw new Error(validationError.userMessage);
+        throw new Error(handled.userMessage);
       }
-
-      console.log('[UPLOAD] File validation passed:', {
-        category: validation.fileCategory,
-        fileName: file.name
-      });
 
       const progress: Phase1UploadProgress = {
         uploadId,
         fileName: file.name,
         progress: 0,
-        status: 'pending',
+        status:   'pending',
       };
-
       options.onProgress?.(progress);
 
-      const { data: { user }, error: authError } = await this.retryOperation(
+      // ── Stage 1b: Auth check ─────────────────────────────────────────────
+      const { data: { user } } = await this.retryOperation(
         async () => {
           const result = await supabase.auth.getUser();
           if (result.error || !result.data.user) {
@@ -136,44 +133,31 @@ class Phase1UploadManager {
         'User authentication check'
       );
 
-      if (authError || !user) {
-        const authErrorDetails = errorHandler.handleError(
-          authError || new Error('User not authenticated'),
-          ErrorCategory.AUTH,
-          'Upload authentication check'
-        );
-        console.error('[UPLOAD ERROR] User authentication failed:', authErrorDetails);
-        throw new Error(authErrorDetails.userMessage);
+      if (!user) {
+        throw new Error('Authentication failed. Please log in and try again.');
       }
 
-      console.log('[UPLOAD] User authenticated:', { userId: user.id });
-
       const sanitizedName = sanitizeFileName(file.name);
-      const timestamp = Date.now();
-      const storagePath = `${user.id}/${timestamp}_${sanitizedName}`;
+      const storagePath   = `${user.id}/${Date.now()}_${sanitizedName}`;
+      const duration      = await getMediaDuration(file);
 
-      console.log('[UPLOAD] Storage path generated:', { storagePath });
-
-      const duration = await getMediaDuration(file);
-
-      progress.status = 'uploading';
+      progress.status   = 'uploading';
       progress.progress = 10;
       options.onProgress?.(progress);
 
-      console.log('[UPLOAD] Creating database record...');
-
+      // ── Stage 1c: Create uploads row (status = uploading) ────────────────
       const { data: uploadRecord, error: dbError } = await this.retryOperation(
         async () => {
           const result = await supabase
             .from('uploads')
             .insert({
-              user_id: user.id,
-              file_name: file.name,
-              file_type: file.type,
-              file_size: file.size,
-              file_category: validation.fileCategory,
-              storage_path: storagePath,
-              upload_status: 'uploading',
+              user_id:           user.id,
+              file_name:         file.name,
+              file_type:         file.type,
+              file_size:         file.size,
+              file_category:     validation.fileCategory,
+              storage_path:      storagePath,
+              upload_status:     'uploading',
               duration,
               original_filename: file.name,
               sanitized_filename: sanitizedName,
@@ -181,10 +165,7 @@ class Phase1UploadManager {
             .select()
             .single();
 
-          if (result.error) {
-            throw result.error;
-          }
-
+          if (result.error) throw result.error;
           return result;
         },
         maxRetries,
@@ -193,38 +174,32 @@ class Phase1UploadManager {
       );
 
       if (dbError || !uploadRecord) {
-        const dbErrorDetails = errorHandler.handleError(
-          dbError || new Error('Failed to create upload record'),
+        const handled = errorHandler.handleError(
+          dbError ?? new Error('Failed to create upload record'),
           ErrorCategory.DATABASE,
           'Upload record creation'
         );
-        console.error('[UPLOAD ERROR] Database record creation failed:', dbErrorDetails);
-        throw new Error(dbErrorDetails.userMessage);
+        throw new Error(handled.userMessage);
       }
-
-      console.log('[UPLOAD] Database record created:', { uploadId: uploadRecord.id });
 
       progress.progress = 30;
       options.onProgress?.(progress);
 
-      const bucket = validation.fileCategory === 'video' ? 'video-content' : 'audio-files';
-
-      console.log('[UPLOAD] Uploading to storage bucket:', { bucket, storagePath });
+      // ── Stage 1d: Upload to Supabase Storage ─────────────────────────────
+      const bucket = getBucketForCategory(validation.fileCategory);
 
       const { error: uploadError } = await this.retryOperation(
         async () => {
+          const contentType = file.type || 'application/octet-stream';
           const result = await supabase.storage
             .from(bucket)
             .upload(storagePath, file, {
               cacheControl: '3600',
-              upsert: false,
-              duplex: 'half',
+              upsert:       false,
+              contentType,
             });
 
-          if (result.error) {
-            throw result.error;
-          }
-
+          if (result.error) throw result.error;
           return result;
         },
         maxRetries,
@@ -233,83 +208,87 @@ class Phase1UploadManager {
       );
 
       if (uploadError) {
-        const storageErrorDetails = errorHandler.handleError(
-          uploadError,
-          ErrorCategory.STORAGE,
-          'Storage upload'
-        );
-        console.error('[UPLOAD ERROR] Storage upload failed:', storageErrorDetails);
-
+        const handled = errorHandler.handleError(uploadError, ErrorCategory.STORAGE, 'Storage upload');
         await supabase.from('uploads').update({ upload_status: 'failed' }).eq('id', uploadRecord.id);
-        throw new Error(storageErrorDetails.userMessage);
+        throw new Error(`Storage upload failed: ${handled.userMessage}`);
       }
 
-      console.log('[UPLOAD SUCCESS] File uploaded to storage successfully');
+      // Store the storage path in the DB; actual file access uses signed URLs at read time.
+      const fileRef = storagePath;
 
+      if (!fileRef || fileRef.trim() === '') {
+        await supabase.from('uploads').update({ upload_status: 'failed' }).eq('id', uploadRecord.id);
+        throw new Error('Storage upload succeeded but file path could not be resolved. Please try again.');
+      }
+
+      progress.url      = fileRef;
       progress.progress = 70;
-      progress.status = 'processing';
+      progress.status   = 'processing';
       options.onProgress?.(progress);
 
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(storagePath);
+      // ── Stages 2–5: DCCS Clearance Pipeline ──────────────────────────────
+      let dccsClearanceCode: string | undefined;
 
-      console.log('[UPLOAD] Public URL generated:', { publicUrl });
+      if (PHASE_1_CONFIG.UPLOAD.GENERATE_DCCS_CODE) {
+        const pipelineResult = await DCCSPipeline.run({
+          uploadId:     uploadRecord.id,
+          userId:       user.id,
+          file,
+          fileCategory: validation.fileCategory ?? 'document',
+          fileName:     file.name,
+          fileSize:     file.size,
+          fileType:     file.type || 'application/octet-stream',
+        });
 
-      progress.url = publicUrl;
+        if (pipelineResult.success) {
+          dccsClearanceCode = pipelineResult.clearanceCode;
+        } else {
+          // Non-fatal — upload still completes without a code
+          console.warn('[UPLOAD] DCCS pipeline did not complete:', pipelineResult.error);
+        }
+      }
+
       progress.progress = 90;
       options.onProgress?.(progress);
 
+      // ── Stage 1e: Mark upload completed ──────────────────────────────────
       const { error: updateError } = await supabase
         .from('uploads')
         .update({
           upload_status: 'completed',
-          file_url: publicUrl,
+          file_url:      publicUrl,
         })
         .eq('id', uploadRecord.id);
 
       if (updateError) {
-        console.error('[UPLOAD ERROR] Failed to update upload record:', updateError);
-        throw new Error(`Update error: ${updateError.message}`);
+        console.error('[UPLOAD] Failed to mark upload completed:', updateError);
+        throw new Error(`Upload finalization failed: ${updateError.message}`);
       }
 
-      console.log('[UPLOAD SUCCESS] Upload completed successfully:', {
-        uploadId: uploadRecord.id,
-        fileName: file.name,
-        url: publicUrl
-      });
-
-      progress.status = 'completed';
-      progress.progress = 100;
+      progress.status           = 'completed';
+      progress.progress         = 100;
+      progress.dccsClearanceCode = dccsClearanceCode;
       options.onProgress?.(progress);
 
       return progress;
-    } catch (error) {
-      const uploadErrorDetails = errorHandler.handleError(
-        error,
+
+    } catch (err) {
+      const handled = errorHandler.handleError(
+        err,
         ErrorCategory.UPLOAD,
         `Upload file: ${file.name}`
       );
-
-      console.error('[UPLOAD ERROR] Upload failed with error:', {
-        uploadId,
-        fileName: file.name,
-        errorCode: uploadErrorDetails.code,
-        error: uploadErrorDetails.message,
-        userMessage: uploadErrorDetails.userMessage,
-        stack: error instanceof Error ? error.stack : undefined
-      });
 
       const failedProgress: Phase1UploadProgress = {
         uploadId,
         fileName: file.name,
         progress: 0,
-        status: 'failed',
-        error: uploadErrorDetails.userMessage,
+        status:   'failed',
+        error:    handled.userMessage,
       };
 
       options.onProgress?.(failedProgress);
-      throw new Error(uploadErrorDetails.userMessage);
+      throw new Error(handled.userMessage);
     } finally {
       this.activeUploads.delete(uploadId);
     }
@@ -324,7 +303,7 @@ class Phase1UploadManager {
   }
 
   cancelAllUploads(): void {
-    this.activeUploads.forEach((controller) => controller.abort());
+    this.activeUploads.forEach(c => c.abort());
     this.activeUploads.clear();
   }
 }

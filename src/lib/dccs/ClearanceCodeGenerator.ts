@@ -28,6 +28,8 @@ export interface ClearanceCode {
   checksum?: string;
 }
 
+import { logger } from '../../utils/logger';
+
 export class ClearanceCodeGenerator {
   private static readonly PREFIX = 'DCCS';
 
@@ -102,9 +104,7 @@ export class ClearanceCodeGenerator {
     // Standardized DCCS format: DCCS-[TYPE]-[YEAR]-[UNIQUE_ID]
     const fullCode = `${this.PREFIX}-${typeCode}-${year}-${uniqueId}`;
 
-    console.log('[DCCS] Code generated:', fullCode);
-    console.log('[DCCS] Type detected:', metadata.assetType, '→', typeCode);
-    console.log('[DCCS] Unique ID assigned:', uniqueId);
+    logger.info('[DCCS] Code generated:', { fullCode, assetType: metadata.assetType, typeCode, uniqueId });
 
     return {
       code: fullCode,
@@ -156,9 +156,11 @@ export class ClearanceCodeGenerator {
    * Retries with new random hash if collision detected
    */
   static async generateUniqueClearanceCode(
-    metadata: AssetMetadata,
+    inputMetadata: AssetMetadata,
     checkUniqueness: (code: string) => Promise<boolean>
   ): Promise<ClearanceCode> {
+    // Work on a local copy so retries never mutate the caller's object.
+    let metadata: AssetMetadata = { ...inputMetadata };
     const maxAttempts = 10;
     let attempts = 0;
 
@@ -168,15 +170,15 @@ export class ClearanceCodeGenerator {
       const isUnique = await checkUniqueness(clearanceCode.fullCode);
 
       if (isUnique) {
-        console.log(`[DCCS] Unique code generated on attempt ${attempts + 1}`);
+        logger.info(`[DCCS] Unique code generated on attempt ${attempts + 1}`, { code: clearanceCode.fullCode });
         return clearanceCode;
       }
 
-      console.warn(`[DCCS] Code collision detected, regenerating... (attempt ${attempts + 1}/${maxAttempts})`);
+      logger.warn(`[DCCS] Code collision on attempt ${attempts + 1}/${maxAttempts}, regenerating...`);
 
-      // Force new random ID for next attempt
-      metadata.fingerprint = undefined;
-      metadata.fileHash = undefined;
+      // Force random ID on retry — mutate a LOCAL copy of metadata, not the
+      // caller's object. This prevents cross-attempt state contamination.
+      metadata = { ...metadata, fingerprint: undefined, fileHash: undefined };
       attempts++;
     }
 

@@ -19,10 +19,19 @@ const FILE_TYPE_MAP: Record<string, 'audio' | 'video' | 'image' | 'document'> = 
   'audio/mp3': 'audio',
   'audio/wav': 'audio',
   'audio/x-wav': 'audio',
+  'audio/wave': 'audio',
   'audio/flac': 'audio',
+  'audio/x-flac': 'audio',
   'audio/aac': 'audio',
   'audio/ogg': 'audio',
+  'audio/opus': 'audio',
   'audio/webm': 'audio',
+  'audio/m4a': 'audio',
+  'audio/x-m4a': 'audio',
+  'audio/mp4': 'audio',
+  'audio/wma': 'audio',
+  'audio/aiff': 'audio',
+  'audio/x-aiff': 'audio',
 
   // Video
   'video/mp4': 'video',
@@ -31,6 +40,10 @@ const FILE_TYPE_MAP: Record<string, 'audio' | 'video' | 'image' | 'document'> = 
   'video/x-msvideo': 'video',
   'video/webm': 'video',
   'video/x-matroska': 'video',
+  'video/x-flv': 'video',
+  'video/x-ms-wmv': 'video',
+  'video/3gpp': 'video',
+  'video/ogg': 'video',
 
   // Image
   'image/jpeg': 'image',
@@ -39,21 +52,42 @@ const FILE_TYPE_MAP: Record<string, 'audio' | 'video' | 'image' | 'document'> = 
   'image/gif': 'image',
   'image/webp': 'image',
   'image/svg+xml': 'image',
+  'image/bmp': 'image',
+  'image/tiff': 'image',
+  'image/heic': 'image',
+  'image/heif': 'image',
+  'image/avif': 'image',
 
   // Document
   'application/pdf': 'document',
   'text/plain': 'document',
+  'text/markdown': 'document',
+  'application/msword': 'document',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'document',
+  'application/json': 'document',
+  'application/xml': 'document',
+  'text/csv': 'document',
+  'application/zip': 'document',
+  'application/x-zip-compressed': 'document',
+  'application/x-rar-compressed': 'document',
+  'application/octet-stream': 'document',
 };
 
 const ALLOWED_EXTENSIONS = [
   // Audio
-  '.mp3', '.wav', '.flac', '.aac', '.ogg', '.m4a', '.wma',
+  '.mp3', '.wav', '.flac', '.aac', '.ogg', '.m4a', '.wma', '.aiff', '.opus',
   // Video
-  '.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv',
+  '.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv', '.3gp', '.ogv',
   // Image
-  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
+  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.tiff', '.heic', '.heif', '.avif',
   // Document
-  '.pdf', '.txt',
+  '.pdf', '.txt', '.doc', '.docx', '.md', '.json', '.xml', '.csv',
+  // Archive
+  '.zip', '.rar', '.7z',
+  // Code
+  '.js', '.ts', '.py', '.java', '.cpp', '.c', '.html', '.css',
+  // 3D & Design
+  '.obj', '.fbx', '.blend', '.glb', '.gltf', '.psd', '.ai', '.fig', '.xd',
 ];
 
 export function validateFile(
@@ -88,35 +122,46 @@ export function validateFile(
     };
   }
 
-  // Check file type
-  const fileType = file.type.toLowerCase();
-  if (!allowedTypes.includes(fileType) && fileType !== '') {
-    return {
-      valid: false,
-      error: `File type ${fileType} is not supported`,
-    };
-  }
-
-  // Check file extension
+  // Check file extension first (more reliable than MIME type)
   const fileName = file.name.toLowerCase();
   const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
 
   if (!hasValidExtension) {
+    console.warn('[FILE VALIDATOR] File extension not supported:', {
+      fileName: file.name,
+      extension: fileName.substring(fileName.lastIndexOf('.')),
+      allowedExtensions: allowedExtensions.slice(0, 10)
+    });
     return {
       valid: false,
-      error: `File extension not supported. Allowed: ${allowedExtensions.join(', ')}`,
+      error: `File extension not supported. Please upload audio, video, images, documents, or code files.`,
     };
   }
 
-  // Determine file category
-  const fileCategory = FILE_TYPE_MAP[fileType] || getFileCategoryFromExtension(fileName);
+  // Determine file category from extension (MIME type can be unreliable)
+  let fileCategory = getFileCategoryFromExtension(fileName);
 
+  // If extension-based detection fails, try MIME type
   if (!fileCategory) {
-    return {
-      valid: false,
-      error: 'Unable to determine file category',
-    };
+    const fileType = file.type.toLowerCase();
+    fileCategory = FILE_TYPE_MAP[fileType];
   }
+
+  // Final fallback - if we still don't know, default to 'document'
+  if (!fileCategory) {
+    console.log('[FILE VALIDATOR] Unknown file category, defaulting to document:', {
+      fileName: file.name,
+      fileType: file.type
+    });
+    fileCategory = 'document';
+  }
+
+  console.log('[FILE VALIDATOR] File validation successful:', {
+    fileName: file.name,
+    fileCategory,
+    fileSize: file.size,
+    fileType: file.type
+  });
 
   return {
     valid: true,
@@ -127,16 +172,21 @@ export function validateFile(
 function getFileCategoryFromExtension(fileName: string): 'audio' | 'video' | 'image' | 'document' | undefined {
   const ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
 
-  if (['.mp3', '.wav', '.flac', '.aac', '.ogg', '.m4a', '.wma'].includes(ext)) {
+  const audioExts = ['.mp3', '.wav', '.flac', '.aac', '.ogg', '.m4a', '.wma', '.aiff', '.opus'];
+  const videoExts = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv', '.3gp', '.ogv'];
+  const imageExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.tiff', '.heic', '.heif', '.avif'];
+  const documentExts = ['.pdf', '.txt', '.doc', '.docx', '.md', '.json', '.xml', '.csv', '.zip', '.rar', '.7z', '.js', '.ts', '.py', '.java', '.cpp', '.c', '.html', '.css', '.obj', '.fbx', '.blend', '.glb', '.gltf', '.psd', '.ai', '.fig', '.xd'];
+
+  if (audioExts.includes(ext)) {
     return 'audio';
   }
-  if (['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv'].includes(ext)) {
+  if (videoExts.includes(ext)) {
     return 'video';
   }
-  if (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'].includes(ext)) {
+  if (imageExts.includes(ext)) {
     return 'image';
   }
-  if (['.pdf', '.txt'].includes(ext)) {
+  if (documentExts.includes(ext)) {
     return 'document';
   }
 

@@ -221,14 +221,10 @@ class UploadManager {
         .eq('id', uploadRecord.id)
         .single();
 
-      // Get file URL
-      const { data: urlData } = supabase.storage
-        .from('user-uploads')
-        .getPublicUrl(storagePath);
-
+      // Store the storage path; files are accessed via signed URLs at read time.
       progress.progress = 100;
       progress.status = 'completed';
-      progress.url = urlData.publicUrl;
+      progress.url = storagePath;
       progress.dccsId = finalUpload?.dccs_certificate_id;
       progress.dccsCertificateId = finalUpload?.dccs_certificates?.certificate_id;
       progress.dccsClearanceCode = finalUpload?.dccs_certificates?.clearance_code;
