@@ -111,25 +111,10 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (!id.includes('node_modules')) {
-            // Page-level code splitting
-            if (id.includes('/pages/')) {
-              const name = id.split('/pages/')[1].split('.')[0];
-              return `page-${name}`;
-            }
-            return undefined;
-          }
-          // Vendor splitting — deterministic chunk names
-          if (id.includes('react-dom'))    return 'vendor-react';
-          if (id.includes('react-router')) return 'vendor-react';
-          if (id.includes('/react/'))      return 'vendor-react';
-          if (id.includes('@supabase'))    return 'vendor-supabase';
-          if (id.includes('ethers'))       return 'vendor-web3';
-          if (id.includes('i18next'))      return 'vendor-i18n';
-          return 'vendor-other';
-        },
-        // Stable chunk file names — prevents unnecessary cache busting
+        // Let Rollup handle chunk splitting automatically.
+        // Manual vendor chunking caused circular dependencies
+        // and the production "Cannot access 't' before initialization" error.
+
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
