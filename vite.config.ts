@@ -6,7 +6,8 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      injectRegister: 'auto',
       includeAssets: [
         'favicon.ico',
         'apple-touch-icon.png',
@@ -49,9 +50,24 @@ export default defineConfig(({ mode }) => ({
         categories: ['business', 'productivity', 'utilities'],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        globPatterns: ['**/*.{ico,png,svg,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/locales/, /^\/legal/],
         runtimeCaching: [
+          {
+            urlPattern: /\/assets\/.*\.(js|css)$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'bundle-assets',
+              expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 },
+              networkTimeoutSeconds: 6,
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -62,7 +78,7 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            urlPattern: /^https:\/\/.*\.Bolt Database\.co\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'supabase-api',
@@ -79,14 +95,6 @@ export default defineConfig(({ mode }) => ({
               cacheableResponse: { statuses: [0, 200] },
             },
           },
-          {
-            urlPattern: /\.(?:js|css)$/i,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'static-resources',
-              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 7 },
-            },
-          },
         ],
       },
       devOptions: { enabled: false },
@@ -94,7 +102,6 @@ export default defineConfig(({ mode }) => ({
   ],
 
   define: {
-    // Inject build-time metadata accessible at runtime via import.meta.env
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __DEPLOY_ENV__: JSON.stringify(process.env.VITE_DEPLOY_ENV ?? 'local'),
   },
@@ -111,21 +118,25 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        // Let Rollup handle chunk splitting automatically.
-        // Manual vendor chunking caused circular dependencies
-        // and the production "Cannot access 't' before initialization" error.
-
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
       },
     },
-    // Warn if any single chunk exceeds 600 kB (encourages splitting)
     chunkSizeWarningLimit: 600,
   },
 
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'react-helmet-async',
+      'lucide-react',
+      'react-i18next',
+      'i18next',
+      '@supabase/Bolt Database-js',
+    ],
   },
 
   server: {
