@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       injectRegister: 'auto',
       includeAssets: [
         'favicon.ico',
@@ -55,7 +55,6 @@ export default defineConfig(({ mode }) => ({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/locales/, /^\/legal/],
         runtimeCaching: [
           {
@@ -63,7 +62,10 @@ export default defineConfig(({ mode }) => ({
             handler: 'NetworkFirst',
             options: {
               cacheName: 'bundle-assets',
-              expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 },
+              expiration: {
+                maxEntries: 120,
+                maxAgeSeconds: 60 * 60 * 24,
+              },
               networkTimeoutSeconds: 6,
               cacheableResponse: { statuses: [0, 200] },
             },
@@ -73,16 +75,22 @@ export default defineConfig(({ mode }) => ({
             handler: 'CacheFirst',
             options: {
               cacheName: 'google-fonts',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
           {
-            urlPattern: /^https:\/\/.*\.Bolt Database\.co\/.*/i,
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'supabase-api',
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 },
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60,
+              },
               networkTimeoutSeconds: 10,
             },
           },
@@ -91,7 +99,10 @@ export default defineConfig(({ mode }) => ({
             handler: 'CacheFirst',
             options: {
               cacheName: 'images',
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
@@ -113,7 +124,10 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === 'production',
         drop_debugger: true,
-        pure_funcs: mode === 'production' ? ['console.log', 'console.debug'] : [],
+        pure_funcs:
+          mode === 'production'
+            ? ['console.log', 'console.debug']
+            : [],
       },
     },
     rollupOptions: {
@@ -135,7 +149,7 @@ export default defineConfig(({ mode }) => ({
       'lucide-react',
       'react-i18next',
       'i18next',
-      '@supabase/Bolt Database-js',
+      '@supabase/supabase-js',
     ],
   },
 
