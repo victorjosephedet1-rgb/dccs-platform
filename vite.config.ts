@@ -17,7 +17,9 @@ workbox: {
           maxAgeSeconds: 60 * 60 * 24,
         },
         networkTimeoutSeconds: 6,
-        cacheableResponse: { statuses: [0, 200] },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
       },
     },
     {
@@ -29,7 +31,9 @@ workbox: {
           maxEntries: 10,
           maxAgeSeconds: 60 * 60 * 24 * 365,
         },
-        cacheableResponse: { statuses: [0, 200] },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
       },
     },
     {
@@ -53,7 +57,9 @@ workbox: {
           maxEntries: 100,
           maxAgeSeconds: 60 * 60 * 24 * 30,
         },
-        cacheableResponse: { statuses: [0, 200] },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
       },
     },
   ],
