@@ -1,17 +1,17 @@
 {
   "version": "1.0.0",
   "commit": {
-    "hash": "ad3d9f4acfd3ede4fb92c3b2953919351db79b22",
-    "short": "ad3d9f4",
-    "message": "Fix PWA service worker precache configuration",
-    "author": "Victor Joseph Edet",
-    "date": "2026-07-28T12:51:46+01:00",
+    "hash": "92eb57fed11c7727101f8de50f2e8bb617e9d35a",
+    "short": "92eb57f",
+    "message": "Finalize Vite PWA config and demo-mode fallbacks",
+    "author": "Muhammad Abdullah",
+    "date": "2026-08-11T00:43:19+05:00",
     "branch": "main"
   },
   "build": {
     "number": "local",
-    "timestamp": "2026-08-10T19:41:51.961Z",
-    "actor": "Victor Joseph Edet"
+    "timestamp": "2026-08-10T21:58:01.871Z",
+    "actor": "Muhammad Abdullah"
   },
   "deployment": {
     "platform": "Netlify",

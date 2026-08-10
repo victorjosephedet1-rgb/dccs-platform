@@ -17,8 +17,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/update-sitemap.js || true",
-    "build": "node scripts/generate-version-file.js || true && vite build",
+    "prebuild": "node scripts/update-sitemap.js",
+    "build": "node scripts/generate-version-file.js && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
