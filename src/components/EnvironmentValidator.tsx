@@ -61,7 +61,7 @@ export default function EnvironmentValidator() {
     setValidations(results);
 
     const hasCritical = results.some(r => r.required && !r.valid);
-    if (hasCritical) {
+    if (hasCritical && import.meta.env.PROD) {
       setShowValidator(true);
     }
   }, []);
@@ -130,10 +130,10 @@ export default function EnvironmentValidator() {
 
           {hasErrors && (
             <div className="mt-4 p-3 bg-red-100 rounded border border-red-300">
-              <p className="text-sm font-semibold text-red-900 mb-1">Action Required</p>
+              <p className="text-sm font-semibold text-red-900 mb-1">Action Required (Production)</p>
               <p className="text-xs text-red-800">
-                Set the missing environment variables in your Netlify site settings and redeploy.
-                The platform cannot function without valid Supabase configuration.
+                Set the missing environment variables in your deployment settings (e.g., Netlify) and redeploy.
+                When running locally without environment variables, the platform runs in Demo Mode.
               </p>
             </div>
           )}

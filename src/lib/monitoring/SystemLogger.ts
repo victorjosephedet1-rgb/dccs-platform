@@ -51,25 +51,27 @@ class SystemLoggerClass {
    * to the browser console only so the calling pipeline is never disrupted.
    */
   log(entry: SystemLogEntry): void {
-    const row = {
-      user_id:    entry.userId ?? null,
-      event_type: entry.eventType,
-      message:    entry.message,
-      metadata:   entry.metadata ?? {},
-      severity:   entry.severity ?? 'info',
-    };
+    try {
+      const row = {
+        user_id:    entry.userId ?? null,
+        event_type: entry.eventType,
+        message:    entry.message,
+        metadata:   entry.metadata ?? {},
+        severity:   entry.severity ?? 'info',
+      };
 
-    supabase
-      .from('dccs_system_logs')
-      .insert(row)
-      .then(({ error }) => {
-        if (error) {
-          logger.warn('[SystemLogger] Failed to persist log entry:', { error, row });
-        }
-      })
-      .catch((err) => {
-        logger.warn('[SystemLogger] Unexpected error persisting log:', err);
-      });
+      Promise.resolve(supabase.from('dccs_system_logs').insert(row))
+        .then((res: any) => {
+          if (res && res.error) {
+            logger.warn('[SystemLogger] Failed to persist log entry:', { error: res.error, row });
+          }
+        })
+        .catch((err) => {
+          logger.warn('[SystemLogger] Unexpected error persisting log:', err);
+        });
+    } catch (err) {
+      logger.warn('[SystemLogger] Synchronous error in logger:', err);
+    }
   }
 
   info(eventType: LogEventType, message: string, userId?: string, metadata?: Record<string, unknown>): void {

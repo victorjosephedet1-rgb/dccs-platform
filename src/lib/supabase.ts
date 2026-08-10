@@ -29,53 +29,79 @@ export const supabase = isSupabaseConfigured
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
         signUp: () => Promise.resolve({ data: { user: null }, error: { message: 'Demo mode - authentication disabled' } }),
         signInWithPassword: () => Promise.resolve({ data: { user: null }, error: { message: 'Demo mode - authentication disabled' } }),
+        signInWithOAuth: () => Promise.resolve({ data: { provider: '', url: '' }, error: null }),
         signOut: () => Promise.resolve({ error: null }),
-        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } }, error: null })
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } }, error: null }),
+        resetPasswordForEmail: () => Promise.resolve({ data: {}, error: null }),
+        updateUser: () => Promise.resolve({ data: { user: null }, error: null }),
+        refreshSession: () => Promise.resolve({ data: { session: null, user: null }, error: null }),
+        resend: () => Promise.resolve({ data: {}, error: null }),
+        verifyOtp: () => Promise.resolve({ data: { session: null, user: null }, error: null }),
+        setSession: () => Promise.resolve({ data: { session: null, user: null }, error: null })
       },
       from: () => {
-        const createMockQueryBuilder = () => ({
-          select: () => createMockQueryBuilder(),
-          insert: () => createMockQueryBuilder(),
-          update: () => createMockQueryBuilder(),
-          delete: () => createMockQueryBuilder(),
-          limit: () => createMockQueryBuilder(),
-          order: () => createMockQueryBuilder(),
-          eq: () => createMockQueryBuilder(),
-          neq: () => createMockQueryBuilder(),
-          gt: () => createMockQueryBuilder(),
-          gte: () => createMockQueryBuilder(),
-          lt: () => createMockQueryBuilder(),
-          lte: () => createMockQueryBuilder(),
-          like: () => createMockQueryBuilder(),
-          ilike: () => createMockQueryBuilder(),
-          is: () => createMockQueryBuilder(),
-          in: () => createMockQueryBuilder(),
-          contains: () => createMockQueryBuilder(),
-          containedBy: () => createMockQueryBuilder(),
-          rangeGt: () => createMockQueryBuilder(),
-          rangeGte: () => createMockQueryBuilder(),
-          rangeLt: () => createMockQueryBuilder(),
-          rangeLte: () => createMockQueryBuilder(),
-          rangeAdjacent: () => createMockQueryBuilder(),
-          overlaps: () => createMockQueryBuilder(),
-          textSearch: () => createMockQueryBuilder(),
-          match: () => createMockQueryBuilder(),
-          not: () => createMockQueryBuilder(),
-          or: () => createMockQueryBuilder(),
-          filter: () => createMockQueryBuilder(),
-          single: () => Promise.resolve({ data: null, error: { message: 'Demo mode - database disabled' } }),
-          maybeSingle: () => Promise.resolve({ data: null, error: { message: 'Demo mode - database disabled' } }),
-          then: (resolve: (value: { data: unknown[]; error: null }) => unknown) => resolve({ data: [], error: null })
-        });
+        const createMockQueryBuilder = (): any => {
+          const promise = Promise.resolve({ data: [], error: null, count: null, status: 200, statusText: 'OK' });
+          return {
+            select: () => createMockQueryBuilder(),
+            insert: () => createMockQueryBuilder(),
+            update: () => createMockQueryBuilder(),
+            delete: () => createMockQueryBuilder(),
+            limit: () => createMockQueryBuilder(),
+            order: () => createMockQueryBuilder(),
+            eq: () => createMockQueryBuilder(),
+            neq: () => createMockQueryBuilder(),
+            gt: () => createMockQueryBuilder(),
+            gte: () => createMockQueryBuilder(),
+            lt: () => createMockQueryBuilder(),
+            lte: () => createMockQueryBuilder(),
+            like: () => createMockQueryBuilder(),
+            ilike: () => createMockQueryBuilder(),
+            is: () => createMockQueryBuilder(),
+            in: () => createMockQueryBuilder(),
+            contains: () => createMockQueryBuilder(),
+            containedBy: () => createMockQueryBuilder(),
+            rangeGt: () => createMockQueryBuilder(),
+            rangeGte: () => createMockQueryBuilder(),
+            rangeLt: () => createMockQueryBuilder(),
+            rangeLte: () => createMockQueryBuilder(),
+            rangeAdjacent: () => createMockQueryBuilder(),
+            overlaps: () => createMockQueryBuilder(),
+            textSearch: () => createMockQueryBuilder(),
+            match: () => createMockQueryBuilder(),
+            not: () => createMockQueryBuilder(),
+            or: () => createMockQueryBuilder(),
+            filter: () => createMockQueryBuilder(),
+            range: () => createMockQueryBuilder(),
+            single: () => Promise.resolve({ data: null, error: null }),
+            maybeSingle: () => Promise.resolve({ data: null, error: null }),
+            then: (onfulfilled?: any, onrejected?: any) => promise.then(onfulfilled, onrejected),
+            catch: (onrejected?: any) => promise.catch(onrejected),
+            finally: (onfinally?: any) => promise.finally(onfinally)
+          };
+        };
         return createMockQueryBuilder();
       },
       storage: {
         from: () => ({
           upload: () => Promise.resolve({ data: null, error: { message: 'Demo mode - storage disabled' } }),
-          remove: () => Promise.resolve({ error: null }),
-          getPublicUrl: () => ({ data: { publicUrl: '' } })
+          remove: () => Promise.resolve({ data: [], error: null }),
+          getPublicUrl: () => ({ data: { publicUrl: '' } }),
+          list: () => Promise.resolve({ data: [], error: null }),
+          download: () => Promise.resolve({ data: new Blob(), error: null }),
+          createSignedUrl: () => Promise.resolve({ data: { signedUrl: '' }, error: null })
         })
-      }
+      },
+      rpc: () => Promise.resolve({ data: null, error: null }),
+      channel: () => ({
+        on: () => ({
+          subscribe: () => ({ unsubscribe: () => {} })
+        }),
+        subscribe: () => ({ unsubscribe: () => {} }),
+        unsubscribe: () => {}
+      }),
+      removeChannel: () => {},
+      getChannels: () => []
     } as unknown as ReturnType<typeof createClient>
 
 export { isSupabaseConfigured }
