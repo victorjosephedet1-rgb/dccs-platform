@@ -78,11 +78,14 @@ export default function DCCSOnboardingModal({ userId, onComplete }: DCCSOnboardi
 
   const handleComplete = async () => {
     setSaving(true);
-    await supabase
-      .from('profiles')
-      .update({ onboarding_completed: true })
-      .eq('id', userId)
-      .catch(() => {});
+    try {
+      await supabase
+        .from('profiles')
+        .update({ onboarding_completed: true })
+        .eq('id', userId);
+    } catch {
+      // Non-blocking: onboarding still completes locally even if the write fails.
+    }
 
     SystemLogger.info('onboarding_complete', 'User completed onboarding', userId);
     setSaving(false);

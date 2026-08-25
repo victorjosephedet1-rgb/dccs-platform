@@ -162,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (data.user) {
-      supabase.rpc('track_instant_login', { p_email: email, p_login_method: 'password' }).catch(() => {});
+      Promise.resolve(supabase.rpc('track_instant_login', { p_email: email, p_login_method: 'password' })).catch(() => {});
     }
 
     addNotification({ type: 'success', title: 'Welcome Back!', message: 'You have successfully logged in.' });
@@ -182,7 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw error;
     }
 
-    supabase.rpc('track_otp_attempt', { p_email: email, p_attempt_type: 'login', p_success: true }).catch(() => {});
+    Promise.resolve(supabase.rpc('track_otp_attempt', { p_email: email, p_attempt_type: 'login', p_success: true })).catch(() => {});
 
     addNotification({ type: 'success', title: 'Magic Link Sent!', message: 'Check your email and click the link to log in.' });
   };
@@ -196,7 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (data.user) {
-      supabase.rpc('track_instant_login', { p_email: email, p_login_method: 'otp' }).catch(() => {});
+      Promise.resolve(supabase.rpc('track_instant_login', { p_email: email, p_login_method: 'otp' })).catch(() => {});
     }
 
     addNotification({ type: 'success', title: 'Verified!', message: 'Welcome back.' });
@@ -225,7 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (!otpError) {
-        supabase.rpc('track_otp_attempt', { p_email: email, p_attempt_type: 'signup', p_success: true }).catch(() => {});
+        Promise.resolve(supabase.rpc('track_otp_attempt', { p_email: email, p_attempt_type: 'signup', p_success: true })).catch(() => {});
       }
 
       addNotification({ type: 'success', title: 'Magic Link Sent!', message: 'Check your email to verify your account.' });
@@ -233,7 +233,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (data.user) {
-      supabase.rpc('track_instant_login', { p_email: email, p_login_method: 'password' }).catch(() => {});
+      Promise.resolve(supabase.rpc('track_instant_login', { p_email: email, p_login_method: 'password' })).catch(() => {});
     }
 
     addNotification({ type: 'success', title: 'Account Created!', message: 'You can start using DCCS immediately.' });
