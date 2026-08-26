@@ -114,13 +114,17 @@ class SystemEventBusClass {
   }
 
   private async persistToDatabase(event: EmittedEvent): Promise<void> {
+    // uploadId here is the client-generated UUID assigned before the uploads
+    // row exists, so it goes to client_upload_id (uuid). The numeric
+    // system_events.upload_id FK is left null — it references uploads.id,
+    // which is a serial the client does not know at emit time.
     const { error } = await supabase.from('system_events').insert({
-      stage:          event.stage,
-      severity:       event.severity,
-      actor_id:       event.context.userId   ?? null,
-      upload_id:      event.context.uploadId ?? null,
-      certificate_id: event.context.certificateId ?? null,
-      context:        event.context,
+      stage:            event.stage,
+      severity:         event.severity,
+      actor_id:         event.context.userId   ?? null,
+      client_upload_id: event.context.uploadId ?? null,
+      certificate_id:   event.context.certificateId ?? null,
+      context:          event.context,
     });
 
     if (error) {

@@ -265,6 +265,10 @@ export class UploadService {
       let dccsClearanceCode: string | undefined;
       let dccsOwnershipCode: string | undefined;
       let certificateId: string | undefined;
+      // Tracks whether the (optional) DCCS stages completed. When they don't,
+      // the state machine has to be degraded past them rather than advanced,
+      // otherwise the skipped stages make the LOCKED transition invalid.
+      let dccsStagesCompleted = false;
 
       if (PHASE_1_CONFIG.UPLOAD.GENERATE_DCCS_CODE) {
         const pipelineResult = await DCCSPipeline.run({
@@ -305,6 +309,7 @@ export class UploadService {
             .eq('client_upload_id', uploadId);
 
           options.onProgress?.(report({ progressPercent: 85, dccsClearanceCode, dccsOwnershipCode, certificateId }));
+          dccsStagesCompleted = true;
         } else {
           // DCCS pipeline failure is non-fatal — file is stored and accessible.
           // Log explicitly, record the error on the upload row, and continue
@@ -339,7 +344,14 @@ export class UploadService {
         throw new Error(`Upload finalization failed: ${finalizeError.message}`);
       }
 
-      await sm.transitionTo('LOCKED', { publicUrl });
+      if (dccsStagesCompleted) {
+        await sm.transitionTo('LOCKED', { publicUrl });
+      } else {
+        // DCCS stages were skipped (non-fatal). Degrade past them so the
+        // upload can still be finalised instead of failing on an invalid
+        // stage transition.
+        await sm.degradeTo('LOCKED', 'DCCS code issuance did not complete', { publicUrl });
+      }
       options.onProgress?.(report({ progressPercent: 95, dccsClearanceCode, certificateId }));
 
       // ── STAGE 7: DISTRIBUTED ──────────────────────────────────────────────

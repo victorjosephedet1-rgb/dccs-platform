@@ -173,6 +173,58 @@ export class ClearanceStateMachine {
     });
   }
 
+  /**
+   * Move to a later stage after an earlier, non-fatal stage was skipped.
+   *
+   * Used when an optional stage (e.g. DCCS code issuance) fails but the upload
+   * itself is still valid — the file is stored and downloadable, so the
+   * pipeline must still be able to reach LOCKED/DISTRIBUTED. Without this,
+   * a skipped stage would make the next transitionTo() throw and turn a
+   * non-fatal failure into a failed upload.
+   *
+   * Only moves forward; emits a warning event recording what was skipped.
+   */
+  async degradeTo(
+    target: PipelineStage,
+    reason: string,
+    context: Record<string, unknown> = {}
+  ): Promise<PipelineStage> {
+    const currentIndex = PIPELINE_STAGES.indexOf(this.state.stage);
+    const targetIndex  = PIPELINE_STAGES.indexOf(target);
+
+    if (targetIndex <= currentIndex) {
+      throw new Error(
+        `[StateMachine] degradeTo cannot move backwards (${this.state.stage} → ${target}).`
+      );
+    }
+
+    const skipped = PIPELINE_STAGES.slice(currentIndex + 1, targetIndex);
+    const now     = new Date().toISOString();
+
+    this.state.stage = target;
+    this.state.history.push({ stage: target, at: now });
+
+    if (target === 'LOCKED') {
+      this.state.lockedAt = now;
+    }
+
+    await SystemEventBus.emit({
+      stage:    target,
+      severity: 'warning',
+      context:  {
+        uploadId: this.state.uploadId,
+        userId:   this.state.userId,
+        label:    STAGE_LABELS[target],
+        degraded: true,
+        skipped,
+        reason,
+        ...context,
+      },
+    });
+
+    return target;
+  }
+
   /** Human-readable progress (0–100) based on current stage index. */
   get progressPercent(): number {
     return Math.round(
