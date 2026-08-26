@@ -458,13 +458,17 @@ export default function MyContentLibrary() {
 
   const handleDownload = async (upload: UploadRow) => {
     try {
-      let url = upload.file_url;
-      if (!url?.trim()) {
-        const bucket = getBucketForCategory(upload.file_category);
-        const { data } = supabase.storage.from(bucket).getPublicUrl(upload.storage_path ?? '');
-        url = data.publicUrl;
+      // Content buckets are private — always mint a short-lived signed URL.
+      // RLS restricts signing to files the signed-in user owns.
+      const bucket = getBucketForCategory(upload.file_category);
+      const { data: signed, error: signErr } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(upload.storage_path ?? '', 60);
+
+      if (signErr || !signed?.signedUrl) {
+        throw new Error(signErr?.message ?? 'Could not resolve download URL.');
       }
-      if (!url) throw new Error('Could not resolve download URL.');
+      const url = signed.signedUrl;
 
       const resp = await fetch(url);
       if (!resp.ok) throw new Error(`Server returned ${resp.status}`);

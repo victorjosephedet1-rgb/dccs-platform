@@ -45,6 +45,10 @@ export interface UploadProgress {
   dccsOwnershipCode?: string;
   certificateId?:     string;
   fileUrl?:           string;
+  /** Storage object path — used to mint a signed download URL (buckets are private). */
+  storagePath?:       string;
+  /** Resolved category, so the caller knows which bucket to sign against. */
+  fileCategory?:      string;
   error?:             string;
 }
 
@@ -128,6 +132,8 @@ export class UploadService {
       stageLabel:      STAGE_LABELS[sm.currentStage],
       progressPercent: sm.progressPercent,
       status:          'running',
+      storagePath,
+      fileCategory:    validation.fileCategory ?? 'document',
       ...extra,
     });
 
@@ -272,6 +278,7 @@ export class UploadService {
 
       if (PHASE_1_CONFIG.UPLOAD.GENERATE_DCCS_CODE) {
         const pipelineResult = await DCCSPipeline.run({
+          uploadRowId:  uploadRecord.id,
           uploadId,
           userId:       user.id,
           file,

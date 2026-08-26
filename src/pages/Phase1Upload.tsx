@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import SEOHead, { PAGE_SEO } from '../components/SEOHead';
 import {
   Upload, X, CheckCircle, AlertCircle, ArrowRight,
-  RefreshCw, Shield, Fingerprint, Lock, Send, Tag, Loader2, ShoppingBag,
+  RefreshCw, Shield, Fingerprint, Lock, Send, Tag, Loader2, ShoppingBag, Download,
 } from 'lucide-react';
 import { uploadService, UploadProgress } from '../lib/pipeline/UploadService';
+import { getBucketForCategory } from '../lib/phase1UploadManager';
+import { logger } from '../utils/logger';
 import { PIPELINE_STAGES, STAGE_LABELS, STAGE_DESCRIPTIONS } from '../lib/pipeline/ClearanceStateMachine';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -83,7 +85,40 @@ function UploadCard({ entry, onRemove, onRetry, onList, isOnline }: {
   const { progress } = entry;
   const [listing, setListing] = useState(false);
   const [listed, setListed] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const sizeMB = (entry.file.size / 1024 / 1024).toFixed(1);
+
+  // Content buckets are private, so downloads go through a short-lived signed
+  // URL. RLS means signing only succeeds for a file this user owns.
+  const handleDownload = async () => {
+    if (!progress?.storagePath || downloading) return;
+    setDownloading(true);
+    try {
+      const bucket = getBucketForCategory(progress.fileCategory ?? 'document');
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(progress.storagePath, 60);
+
+      if (error || !data?.signedUrl) {
+        throw new Error(error?.message ?? 'Could not create a download link.');
+      }
+
+      const resp = await fetch(data.signedUrl);
+      if (!resp.ok) throw new Error(`Server returned ${resp.status}`);
+
+      const objectUrl = URL.createObjectURL(await resp.blob());
+      const anchor = Object.assign(document.createElement('a'), {
+        href: objectUrl, download: entry.file.name,
+      });
+      document.body.appendChild(anchor);
+      anchor.click();
+      setTimeout(() => { URL.revokeObjectURL(objectUrl); document.body.removeChild(anchor); }, 1000);
+    } catch (err) {
+      logger.error('[Phase1Upload] Download failed:', err);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div
@@ -141,6 +176,17 @@ function UploadCard({ entry, onRemove, onRetry, onList, isOnline }: {
               <PipelineStageBadge key={s} stage={s} active={true} />
             ))}
           </div>
+          {/* Download the DCCS-registered file back to the creator's device */}
+          <button
+            onClick={handleDownload}
+            disabled={downloading || !progress.storagePath}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
+            style={{ background: 'rgba(255,90,31,0.15)', border: '1px solid rgba(255,90,31,0.35)', color: '#FF8A5B' }}
+          >
+            {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            {downloading ? 'Preparing download...' : 'Download File'}
+          </button>
+
           {/* Marketplace quick-list */}
           {!listed ? (
             <button

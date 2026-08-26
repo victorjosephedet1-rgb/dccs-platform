@@ -15,7 +15,8 @@ import { supabase } from '../supabase';
 import type { FingerprintResult } from './FingerprintService';
 
 export interface OwnershipRecordInput {
-  uploadId:     string;
+  /** Numeric uploads.id — this is the FK target, not the client-side UUID. */
+  uploadId:     number;
   userId:       string;
   fingerprint:  FingerprintResult;
   /** The clearance code generated in Stage 4 — stored here as the asset identity anchor */

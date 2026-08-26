@@ -112,19 +112,19 @@ export default function Phase1Downloads() {
     setDownloading(upload.id);
 
     try {
-      // Use the stored public URL if available, otherwise derive it from bucket + path.
-      // Both audio-files and video-content are public buckets — no signed URL needed.
-      let downloadUrl = upload.file_url;
+      // Content buckets are private, so a stored public URL will not resolve.
+      // Always mint a short-lived signed URL — RLS means this only succeeds for
+      // a file the signed-in user actually owns.
+      const bucket = getBucketForCategory(upload.file_category);
+      const { data: signed, error: signErr } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(upload.storage_path, 60);
 
-      if (!downloadUrl || downloadUrl.trim() === '') {
-        const bucket = getBucketForCategory(upload.file_category);
-        const { data } = supabase.storage.from(bucket).getPublicUrl(upload.storage_path);
-        downloadUrl = data.publicUrl;
+      if (signErr || !signed?.signedUrl) {
+        throw new Error(signErr?.message ?? 'Could not resolve download URL for this file.');
       }
 
-      if (!downloadUrl) {
-        throw new Error('Could not resolve download URL for this file.');
-      }
+      const downloadUrl = signed.signedUrl;
 
       const response = await fetch(downloadUrl);
       if (!response.ok) {

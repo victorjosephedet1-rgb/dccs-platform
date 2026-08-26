@@ -40,6 +40,12 @@ import type { AssetMetadata }        from '../dccs/ClearanceCodeGenerator';
 // ---------------------------------------------------------------------------
 
 export interface DCCSPipelineInput {
+  /**
+   * Numeric uploads.id — used for every database FK and row lookup.
+   * Distinct from clientUploadId, which only correlates client-side progress.
+   */
+  uploadRowId:  number;
+  /** Client-generated UUID, assigned before the uploads row exists. */
   uploadId:     string;
   userId:       string;
   file:         File;
@@ -217,7 +223,7 @@ export const DCCSPipeline = {
    * the upload is never failed by a pipeline issue.
    */
   async run(input: DCCSPipelineInput): Promise<DCCSPipelineResult> {
-    const { uploadId, userId, file, fileCategory, fileName, fileSize, fileType } = input;
+    const { uploadRowId, uploadId, userId, file, fileCategory, fileName, fileSize, fileType } = input;
 
     const ctx = { uploadId, userId, fileName, fileCategory };
 
@@ -248,9 +254,11 @@ export const DCCSPipeline = {
         userId, uploadId, fileName, fileCategory, sha256, shortHash, clearanceCode, uniqueId
       );
 
-      // Append-only fingerprint ownership record
+      // Append-only fingerprint ownership record.
+      // Keyed by the numeric uploads.id — dccs_fingerprints.upload_id is an
+      // integer FK, not the client-side UUID.
       const { fingerprintRecordId } = await createOwnershipRecord({
-        uploadId,
+        uploadId: uploadRowId,
         userId,
         fingerprint,
         clearanceCode,
