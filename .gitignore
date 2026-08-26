@@ -25,3 +25,9 @@ dist-ssr
 .env
 .env.production
 .env.production
+
+# Local scratch/debug tooling (migration scripts, schema snapshots) — not part of the app
+backups/
+
+# Supabase CLI local cache
+supabase/.temp/

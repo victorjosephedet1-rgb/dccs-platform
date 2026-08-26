@@ -196,7 +196,7 @@ async function linkCertificateToUpload(
   const { error } = await supabase
     .from('uploads')
     .update({ dccs_certificate_id: certificateId })
-    .eq('id', uploadId);
+    .eq('client_upload_id', uploadId);
 
   if (error) {
     throw new Error(

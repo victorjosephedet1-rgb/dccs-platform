@@ -162,7 +162,7 @@ export class UploadService {
           const result = await supabase
             .from('uploads')
             .insert({
-              id:                 uploadId,
+              client_upload_id:   uploadId,
               user_id:            user.id,
               file_name:          file.name,
               file_type:          file.type || 'application/octet-stream',
@@ -213,7 +213,7 @@ export class UploadService {
         await supabase
           .from('uploads')
           .update({ upload_status: 'failed', pipeline_state: 'INGESTED' })
-          .eq('id', uploadId);
+          .eq('client_upload_id', uploadId);
         const handled = errorHandler.handleError(storageError, ErrorCategory.STORAGE, 'storage upload');
         throw new Error(handled.userMessage);
       }
@@ -226,7 +226,7 @@ export class UploadService {
           .from('uploads')
           .update({ upload_status: 'failed', pipeline_state: 'INGESTED',
                     error_message: 'Storage URL resolution failed after successful upload.' })
-          .eq('id', uploadId);
+          .eq('client_upload_id', uploadId);
         throw new Error(
           'Storage upload succeeded but file URL could not be resolved. ' +
           'This is a storage configuration issue — please contact support.'
@@ -242,7 +242,7 @@ export class UploadService {
       await supabase
         .from('uploads')
         .update({ pipeline_state: 'FINGERPRINTED' })
-        .eq('id', uploadId);
+        .eq('client_upload_id', uploadId);
 
       options.onProgress?.(report({ progressPercent: 45 }));
 
@@ -255,7 +255,7 @@ export class UploadService {
       await supabase
         .from('uploads')
         .update({ pipeline_state: 'BOUND_TO_CREATOR' })
-        .eq('id', uploadId);
+        .eq('client_upload_id', uploadId);
 
       options.onProgress?.(report({ progressPercent: 60 }));
 
@@ -290,7 +290,7 @@ export class UploadService {
           await supabase
             .from('uploads')
             .update({ pipeline_state: 'CODE_ISSUED' })
-            .eq('id', uploadId);
+            .eq('client_upload_id', uploadId);
 
           options.onProgress?.(report({ progressPercent: 75, dccsClearanceCode, dccsOwnershipCode, certificateId }));
 
@@ -302,7 +302,7 @@ export class UploadService {
           await supabase
             .from('uploads')
             .update({ pipeline_state: 'VERIFIED' })
-            .eq('id', uploadId);
+            .eq('client_upload_id', uploadId);
 
           options.onProgress?.(report({ progressPercent: 85, dccsClearanceCode, dccsOwnershipCode, certificateId }));
         } else {
@@ -320,7 +320,7 @@ export class UploadService {
           await supabase
             .from('uploads')
             .update({ error_message: `DCCS code generation failed: ${pipelineResult.error ?? 'unknown error'}` })
-            .eq('id', uploadId);
+            .eq('client_upload_id', uploadId);
         }
       }
 
@@ -333,7 +333,7 @@ export class UploadService {
           pipeline_state:  'LOCKED',
           file_url:        publicUrl,
         })
-        .eq('id', uploadId);
+        .eq('client_upload_id', uploadId);
 
       if (finalizeError) {
         throw new Error(`Upload finalization failed: ${finalizeError.message}`);
@@ -346,7 +346,7 @@ export class UploadService {
       await supabase
         .from('uploads')
         .update({ pipeline_state: 'DISTRIBUTED' })
-        .eq('id', uploadId);
+        .eq('client_upload_id', uploadId);
 
       await sm.transitionTo('DISTRIBUTED', { publicUrl, bucket });
 
@@ -391,7 +391,7 @@ export class UploadService {
           upload_status: 'failed',
           error_message: handled.userMessage,
         })
-        .eq('id', uploadId)
+        .eq('client_upload_id', uploadId)
         .then(({ error: updateErr }) => {
           if (updateErr) {
             logger.error(
